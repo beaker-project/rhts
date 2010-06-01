@@ -1,0 +1,106 @@
+#!/bin/bash
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# is made available to anyone wishing to use, modify, copy, or 
+# redistribute it subject to the terms and conditions of the GNU General 
+# Public License v.2.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# Author: David Malcolm <dmalcolm@redhat.com>
+# Author: Bill Peck <bpeck@redhat.com>
+
+#
+# rhts-run-simple-test
+# 
+# Generic implementation of runtest.sh which handles the common case
+# of wanting to run a single executable (including a script), capturing
+# stdout and stderr to OUTPUTFILE, and passing/failing based on the exit
+# code from the executable, making a good effort to report a result even
+# if the script fails.
+#
+#
+# Tests using this should have a runtest.sh that reads:
+#
+#  #!/bin/sh
+#  rhts-run-simple-test [-u user-to-run-as] name-of-test name-of-my-executable
+# you can have multiple lines for multiple tests...
+
+
+# Source the API:
+. /usr/bin/rhts-environment.sh
+
+export -n OUTPUTFILE
+
+function handle_failure {
+	ARG_ERROR_MESSAGE=$1
+
+	echo $ARG_ERROR_MESSAGE | tee -a $OUTPUTFILE
+
+	report_result $ARG_TEST_NAME "FAIL"
+	exit 1	
+}
+
+RESULT=FAIL
+USAGE_MSG="Usage: rhts-run-simple-test [-u userid_to_run_as] name-of-test 'command-to-run args...'"
+
+case "$1" in
+      -u)        shift; user=$1; shift;;
+      -h|--help) echo "$USAGE_MSG"; exit 0;;
+esac
+
+if [ $# -ne 2 ]; then
+        handle_failure "Wrong number of arguments. $USAGE_MSG"
+fi 
+
+ARG_TEST_NAME=$1
+ARG_EXECUTABLE_NAME=$2
+
+set -- $ARG_EXECUTABLE_NAME
+ARG_EXECUTABLE_NAME=$1
+shift
+ARG_EXECUTABLE_ARGS=$*
+
+if [ -z "$ARG_EXECUTABLE_NAME" -o -z "$ARG_TEST_NAME" ]; then
+	handle_failure "Empty argument(s). $USAGE_MSG"
+fi
+
+which $ARG_EXECUTABLE_NAME
+if [ $? -ne 0 ]; then
+	handle_failure "$ARG_EXECUTABLE_NAME not found"
+fi
+
+# We use a temporary file to capture the exit code of the command we're 
+# interested in within the nested block, whilst getting the output to tee
+TMPFILE=`mktemp`
+if [ $? -ne 0 ]; then
+	handle_failure "Unable to create temporary file"
+fi
+
+{
+	echo -n "Running $ARG_EXECUTABLE_NAME "
+        if [ -n "$user" ]; then
+            echo "As $user: "
+            HOME=$(eval "echo ~$user") LOGNAME=$user USER=$user /bin/su -m $user -c "$ARG_EXECUTABLE_NAME $ARG_EXECUTABLE_ARGS"
+        else
+            echo " As $(whoami): "
+	    $ARG_EXECUTABLE_NAME $ARG_EXECUTABLE_ARGS
+        fi
+	EXIT_CODE=$?
+	echo "$EXIT_CODE" > $TMPFILE
+
+	echo "...finished running $ARG_EXECUTABLE_NAME, exit code=$EXIT_CODE"
+} 2>&1 | tee -a $OUTPUTFILE
+
+#echo "recovered exit code=`cat $TMPFILE`"
+
+if [ `cat $TMPFILE` -eq 0 ]; then
+	RESULT="PASS"
+fi
+
+report_result $ARG_TEST_NAME $RESULT

@@ -1,0 +1,108 @@
+#!/usr/bin/python
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# is made available to anyone wishing to use, modify, copy, or 
+# redistribute it subject to the terms and conditions of the GNU General 
+# Public License v.2.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# Author: Bill Peck
+#
+
+import sys, getopt
+
+# xmlrpclib doesn't support timeouts
+#import xmlrpclib
+import timeout_xmlrpclib as xmlrpclib
+
+import string
+import os
+import pprint
+import time
+import socket
+
+result_server = ''
+recipesetid = ''
+hostname = ''
+
+USAGE_TEXT = """
+Usage: rhts-sync-block -s <STATE> [-s <STATE>] <MACHINE> [<MACHINE>] [<MACHINE>]
+"""
+
+def sync_block(states,machines):
+    global result_server, hostname, recipesetid
+    result_server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % result_server
+
+    if not result_server:
+       raise Exception, "You must sepcify the result server with the -R switch"
+
+    if not recipesetid:
+       raise Exception, "You must sepcify the recipesetid with the -r switch"
+
+    client = xmlrpclib.Server(result_server)
+    curr_states = []
+    CONSOLE = open("/dev/console", "w")
+    while not curr_states:
+        try:
+            curr_states = client.sync.block(recipesetid,-1,result_server,states,machines)
+        except socket.timeout:
+            CONSOLE.write('rhts-recipe-sync-block Timeout!\n')
+        except:
+            pass
+        time.sleep(5)
+    CONSOLE.close()
+    print string.join(curr_states,":")
+
+
+def usage():
+    sys.stderr.write(USAGE_TEXT)
+    sys.exit(-1)
+
+def main():
+    global result_server, hostname, recipesetid
+
+    if ('RESULT_SERVER' in os.environ.keys()):
+        result_server = os.environ['RESULT_SERVER']
+    if ('RECIPESETID' in os.environ.keys()):
+        recipesetid = os.environ['RECIPESETID']
+
+    states = []
+    args = sys.argv[1:]
+    try:
+        opts, args = getopt.getopt(args, 'r:t:s:R:', ['result_server='])
+    except:
+        usage()
+    for opt, val in opts:
+        if opt in ('-s', '--state'):
+            states.append(val)
+        if opt in ('-R', '--result_server'):
+            result_server = val
+        if opt in ('-r', '--recipesetid'):
+            recipesetid = val
+
+    machines = args[0:]
+    if not machines:
+        print "no machines specified. exiting"
+        sys.exit(0)
+
+    if not states:
+       raise Exception, "You must sepcify a state with the -s switch"
+
+    if not result_server:
+        sys.stderr.write("result_server not set, assuming developer mode.\n")
+        sys.stderr.write("Enter STATE:STATE:etc. when the following machines\n %s\nare in one of these states: %s" % (machines,states))
+        resp = raw_input()
+	print resp
+    else:
+        sync_block(states,machines)
+
+if __name__ == '__main__':
+    main()
+    sys.exit(0)
+

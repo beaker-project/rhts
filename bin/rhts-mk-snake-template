@@ -1,0 +1,71 @@
+#!/bin/bash
+
+METADATA="testinfo.desc"
+VERBOSE=0
+SNAKE_SERVER=${SNAKE_SERVER:-}
+progname=$0
+
+function usage () {
+   cat <<EOF
+Usage: $progname [-v] [-s snakeserver]
+    Submit a SNAKE template to a snake server.  The SNAKE template is indicated
+    by use of the 'Kickstart' keyword in your $METADATA.  The server can be
+    specified by using setting the \$SNAKE_SERVER environment variable, or by using
+    the -s command-line switch.
+EOF
+   exit 0
+}
+
+while getopts "v:s:h" opt; do
+   case $opt in
+
+   v )  VERBOSE=1 ;;
+   s )  SNAKE_SERVER=$OPTARG ;;
+   h )  usage ;;
+   \?)  usage ;;
+   esac
+done
+
+shift $(($OPTIND - 1))
+
+# If needed, build the metadata file
+if [ ! -f $METADATA ]; then
+    echo "Buildign $METADATA file"
+    make $METADATA || exit $?
+fi
+
+# Does the $METADATA file exist?
+if [ -f "$METADATA" ]; then
+    # Is a kickstart specified in the $METADATA file?
+    TEMPLATE=$(grep "^Kickstart:" $METADATA | gawk '{print $2}')
+    if [ -n "$TEMPLATE" ]; then
+
+        echo "Kickstart template '$TEMPLATE' specified"
+
+        # SNAKE_SERVER provided?
+        if [ -z "$SNAKE_SERVER" ]; then
+            echo "No snake server provided."
+            exit -1
+        fi
+
+        # snake-ks utility in PATH?
+        SNAKEKS=$(which snake-ks)
+        if [ $? -ne 0 ]; then
+            echo "Could not find the 'snake-ks' command in \$PATH"
+            exit -1
+        fi
+
+        # Does the provided $TEMPLATE file exist?
+        if [ -f "$TEMPLATE" ]; then
+            echo "Uploading SNAKE template '$TEMPLATE' to '$SNAKE_SERVER' ..."
+            $SNAKEKS -s $SNAKE_SERVER add $TEMPLATE
+            exit $?
+        else
+            echo "SNAKE template '$TEMPLATE' not found"
+            echo -1
+        fi
+    else
+        echo "No SNAKE template specified, ignoring"
+    fi
+fi
+

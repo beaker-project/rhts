@@ -1,0 +1,60 @@
+#!/usr/bin/python
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# is made available to anyone wishing to use, modify, copy, or 
+# redistribute it subject to the terms and conditions of the GNU General 
+# Public License v.2.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# Author: Greg Nichols
+# Updated by: Bill Peck <bpeck@redhat.com>
+
+# Use a hardcoded path for RHTS python modules for now:
+import sys, xmlrpclib, os
+sys.path.append("/usr/share/rhts/lib")
+import rhts
+from rhts_workflow import Scheduler
+
+USAGE_TEXT = """
+Usage:
+    rhts-mk-test-import <scheduler> <rpmname> <version>
+"""
+def usage():
+    print USAGE_TEXT
+    sys.exit(-1)
+
+def read_rpm(filename):
+    FH = open(filename, "r")
+    data = FH.read()
+    FH.close()
+    return data
+
+args = sys.argv[1:]
+if len(args) != 3:
+  print "ERROR: %s args provided" % (len(args))
+  usage()
+
+testrpmname = sys.argv[2]
+testversion = sys.argv[3]
+
+try:
+    sched = Scheduler(sys.argv[1], "dummyrepo", type='https')
+except:
+    sched = Scheduler(sys.argv[1], "dummyrepo", type='http')
+rhts.ensure_connection(sched)
+
+data = read_rpm(testrpmname)
+binarydata = xmlrpclib.Binary(data)
+basetestrpmname = os.path.basename(testrpmname)
+(ret, msg) = sched.test.import_testrpm(basetestrpmname,binarydata,testversion)
+print msg
+if ret:
+    sys.exit(0)
+else:
+    sys.exit(1)

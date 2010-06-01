@@ -1,0 +1,86 @@
+#!/usr/bin/python
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# is made available to anyone wishing to use, modify, copy, or 
+# redistribute it subject to the terms and conditions of the GNU General 
+# Public License v.2.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# Author: Bill Peck
+#
+
+import sys, getopt
+import xmlrpclib
+import string
+import os
+import pprint
+
+import rhts
+
+server = ''
+
+USAGE_TEXT = """
+Usage:  rhts-submit-log -T <recipetestid> -l <logfile>
+"""
+
+def report_log(recipetestid, logname):
+   session = xmlrpclib.Server(result_server)
+   rhts.uploadWrapper(session, logname, recipetestid)
+
+
+def usage():
+    print USAGE_TEXT
+    sys.exit(-1)
+
+def main():
+    global result_server, recipetestid
+
+    result_server = ''
+    recipetestid = ''
+
+    if ('RESULT_SERVER' in os.environ.keys()):
+        result_server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % os.environ['RESULT_SERVER']
+    if ('RECIPETESTID' in os.environ.keys()):
+        recipetestid = os.environ['RECIPETESTID']
+
+    logpath = ''
+    logname = ''
+    logdata = ''
+    args = sys.argv[1:]
+    try:
+        opts, args = getopt.getopt(args, 'l:T:S:', ['server='])
+    except:
+        usage()
+    for opt, val in opts:
+        if opt in ('-T', '--testid'):
+            recipetestid = val
+        if opt in ('-l', '--log'):
+            logname = val
+        if opt in ('-S', '--server'):
+            result_server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % val
+
+    if not logname:
+        print "You must sepcify a logfile with the -l switch"
+        sys.exit(1)
+
+    if not result_server:
+        print "result_server not set, assuming developer mode."
+        print "Log File : %s" % logname
+        sys.exit(0)
+    else:
+        if not recipetestid:
+           print "You must sepcify a recipetestid with the -T switch"
+           sys.exit(1)
+        report_log(recipetestid, logname)
+
+
+if __name__ == '__main__':
+    main()
+    sys.exit(0)
+

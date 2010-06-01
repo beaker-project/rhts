@@ -1,0 +1,50 @@
+#!/bin/sh
+PATH=/sbin:/usr/sbin:$PATH
+[ -d "/selinux" ] && SELINUX=true || SELINUX=false
+
+usage="Usage: $0 [OPTION]
+Restore all files and directories backed up with rhts-backup.
+Must be run as root to preserve all permissions and attributes.
+
+    -h, -?, --help    display this help and exit
+
+This tool is automatically run by RHTS when test completes.
+If RHTS_BACKUP_DIR is set, data will be restored from that directory.
+
+The tool does not remove new files appearing after backup has been made.
+If you don't want to leave anything behind just remove the whole original
+tree before running rhts-restore.
+"
+
+if [[ "$1" == "--help" || "$1" == "-h"  || "$1" == "-?" ]]; then
+    echo "$usage"
+    exit 1
+fi
+
+# set backup source directory, make sure it exists
+if [ -n "$RHTS_BACKUP_DIR" ]; then
+    SRC=$(echo "$RHTS_BACKUP_DIR" | sed 's|/$||')
+    [ -d "${SRC}" ] || { echo "Failed to restore files, there is no ${SRC} directory."; exit 1; }
+    echo "Backup directory set. Restoring files from ${SRC}."
+elif [ -z "$RECIPETESTID" ]; then
+    echo "Developer mode detected, RHTS_BACKUP_DIR not set. Nothing to do."
+    exit 0
+else  
+    SRC="/var/cache/rhts/${RECIPETESTID}/backup"
+    [ -d "${SRC}" ] || { echo "Nothing to restore."; exit 0; }
+fi
+
+# restore files
+if $SELINUX; then
+    # when selinux enabled we need -c here (cp bug #470207)
+    cp -fac "${SRC}"/* /
+else
+    cp -fa "${SRC}"/* /
+fi
+
+if [ "$?" != "0" ]; then
+    echo "Failed to restore files from ${SRC}."
+    exit 1
+fi
+
+exit 0

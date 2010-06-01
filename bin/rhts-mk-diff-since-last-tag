@@ -1,0 +1,45 @@
+#!/bin/sh
+# Copyright (c) 2010 Red Hat, Inc. All rights reserved. This copyrighted material 
+# is made available to anyone wishing to use, modify, copy, or 
+# redistribute it subject to the terms and conditions of the GNU General 
+# Public License v.2.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# Author: Zack Cerza
+#
+# Show differences since the last tag
+
+if [ $# -gt 1 ]; then
+	usage
+	exit 1
+fi
+
+if [ $# == 1 ]; then
+	pushd $1 > /dev/null
+fi
+
+CURRENT_TAG=`rhts-mk-get-current-tag`
+
+if [ -d "CVS" ]; then
+    cvs diff -r $CURRENT_TAG
+fi
+
+if [ -d ".svn" ]; then
+    echo "SVN not supported yet!"
+    exit 1
+fi
+
+if git log -1 &>/dev/null; then
+    git diff $CURRENT_TAG .
+fi
+
+if [ $# == 1 ]; then
+	popd > /dev/null
+fi

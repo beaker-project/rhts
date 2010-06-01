@@ -1,0 +1,59 @@
+#!/bin/sh
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# is made available to anyone wishing to use, modify, copy, or 
+# redistribute it subject to the terms and conditions of the GNU General 
+# Public License v.2.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# Author: David Malcolm
+
+function usage() {
+	echo "Usage: rhts-report-result TESTNAME TESTRESULT LOGFILE [METRIC]"
+	echo "where TESTNAME is the name of the test result being reported"
+	echo "      TESTRESULT should be PASS or FAIL"
+	echo "      LOGFILE is the name of the log file to be uploaded"
+	echo "      METRIC is an optional numeric metric (e.g. a performance figure)"
+	echo "It will also upload the kernel ring buffer (using dmesg)"
+}
+
+if [ $# -lt 3 -o $# -gt 4 ]; then
+	usage
+	exit 1
+fi
+
+if [ -n "$4" ]; then
+    resultvalue="--resultvalue=$4"
+fi
+
+# echo Reporting test $1 as $2 > /dev/stderr
+dmesg -c > /tmp/dmesg.log
+
+if [ "$RESULT_SERVER+is_not_set" = "+is_not_set" ]; then 
+		SERVER_OPTIONS=""
+else
+		SERVER_OPTIONS="--server=$RESULT_SERVER"
+fi
+
+if [ "$RECIPETESTID+is_not_set" = "+is_not_set" ]; then 
+		RECIPETESTID_OPTIONS=""
+else
+		RECIPETESTID_OPTIONS="--testid=$RECIPETESTID"
+fi
+
+rhts-db-submit-result \
+	--testname=$1 \
+	--result=$2 \
+	--log=$3 \
+	$resultvalue \
+	$SERVER_OPTIONS \
+	--testversion=$TESTVERSION \
+	--dmesg=/tmp/dmesg.log \
+	$RECIPETESTID_OPTIONS 
+

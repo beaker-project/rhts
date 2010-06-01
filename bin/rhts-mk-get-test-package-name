@@ -1,0 +1,76 @@
+#!/bin/sh
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# is made available to anyone wishing to use, modify, copy, or 
+# redistribute it subject to the terms and conditions of the GNU General 
+# Public License v.2.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# Author: Greg Nichols
+
+# Build an RHTS package from a CVS working copy of the test
+
+function usage {
+	echo "Usage: rhts-mk-get-test-package-name [directory]"
+}
+if [ $# -gt 1 ]; then
+	usage
+	exit 1
+fi
+
+if [ $# == 1 ]; then
+	SOURCE_DIR="$1"
+else
+	SOURCE_DIR=`pwd`
+fi
+
+# are we under cvs?
+if [ -d $SOURCE_DIR/CVS ]; then
+	REPO_PATH=`cat $SOURCE_DIR/CVS/Repository | sed -e "s/\//-/g" | sed -e "s/[\.\,\$\:\;\@]/_/g"`
+	REPO_NAME="rh"
+	PACKAGE_NAME="$REPO_NAME-$REPO_PATH"
+fi
+
+if [ -d "$SOURCE_DIR/.svn" ]; then
+	REPO_ROOT=`svn info $SOURCE_DIR | fgrep "Repository Root:" | awk '{print $3}'`
+	REPO_NAME=`echo $REPO_ROOT | sed -e "s/http[s]\?:\/\///" | sed -e "s/[\.\/]/-/g"`
+	PACKAGE_NAME=`svn info $SOURCE_DIR  |  fgrep "URL:" | awk '{print $2}' | sed -e "s/http[s]\?:\/\///" | sed -e "s/[\.\/]/-/g"`
+        # Shorten package names for the 108 repo:
+	PACKAGE_NAME=`echo $PACKAGE_NAME | sed -e "s/testing-108-redhat-com-svn-testing-trunk-rhts-tests-promoted/tc/"`
+	PACKAGE_NAME=`echo $PACKAGE_NAME | sed -e "s/testing-108-redhat-com-svn-testing-trunk-rhts-tests-sandbox/tc-sandbox/"`
+fi
+
+if hg root &> /dev/null; then
+    # Use the directory name (module name) of the original source of this cloned hg repo
+	REPO_PATH=`echo $TEST | sed -e "s|/|-|g"`
+	REPO_ROOT=`hg root`
+	REPO_URL=`sed -rn 's|^default *=||p' $REPO_ROOT/.hg/hgrc`
+	REPO_NAME=`basename $REPO_URL`
+	PACKAGE_NAME="$REPO_NAME$REPO_PATH"
+fi
+
+if git log -1 &> /dev/null; then
+	REPO_PATH=`echo $TEST | sed -e "s|/|-|g"`
+	REPO_REMOTE=`git config --get branch.master.remote`
+	REPO_URL=`git config --get remote.$REPO_REMOTE.url`
+	REPO_NAME=`basename $REPO_URL | sed -e 's/\.git$//'`
+	PACKAGE_NAME="$REPO_NAME$REPO_PATH"
+fi
+
+if [ -z "$PACKAGE_NAME" ]; then
+	# Use "tmp" as the prefix for tests not stored in source control, and 
+	# use the TEST variable name to create a path.
+	# This is really intended to be used from "make rpm", rather that 
+	# called independently
+	REPO_PATH=`echo $TEST | sed -e "s/\//-/g"`
+	REPO_NAME="tmp"
+	PACKAGE_NAME="$REPO_NAME$REPO_PATH"
+fi
+
+echo "$PACKAGE_NAME"

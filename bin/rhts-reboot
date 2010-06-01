@@ -1,0 +1,31 @@
+#!/bin/sh
+PATH=/sbin:/usr/sbin:$PATH
+
+if [ "$RESULT_SERVER+is_not_set" = "+is_not_set" ]; then 
+	echo "RHTS test $TEST wants to reboot your system"
+	echo -n "Press Enter to reboot or hit CTRL-C to stop"
+	read Dummy
+else
+        # preserve $OUTPUTfile across reboots
+        if [ -n "$OUTPUTFILE" ]; then
+	    echo "export OUTPUTFILE=$OUTPUTFILE" >> /var/cache/rhts/$TESTID/ENV
+	fi
+fi
+
+# ia64 need nextboot set
+MYARCH=$(uname -m)
+if [ "x$MYARCH" = "xia64" -a -e "/usr/sbin/efibootmgr" ]; then
+    EFI=$(efibootmgr -v | grep BootCurrent | awk '{ print $2}')
+    if [ -n "$EFI" ]; then
+        logger -s "efibootmgr -n $(efibootmgr -v | grep BootCurrent | awk '{ print $2}')"
+        efibootmgr -n $(efibootmgr -v | grep BootCurrent | awk '{ print $2}')
+    fi
+fi
+
+/sbin/shutdown -r now
+
+# Wait for the shutdown to kill us..  we don't want control to go back
+#  to the test harness.
+while (true); do
+    sleep 666
+done

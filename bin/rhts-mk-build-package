@@ -1,0 +1,128 @@
+#!/bin/sh
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# is made available to anyone wishing to use, modify, copy, or 
+# redistribute it subject to the terms and conditions of the GNU General 
+# Public License v.2.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# Author: Greg Nichols
+
+# Build an RHTS package from a CVS or Subversion working copy of the test
+
+progname=$0
+
+function usage () {
+   cat <<EOF
+Usage: $progname [-a] [-d directory] [-b] [-s testserver]
+    Build an RHTS package of tests from the source tree "directory" 
+    (e.g. a CVS working copy of the test).  If directory is not supplied, 
+    the current directory is used.
+    If testserver is supplied the resulting rpms will be submitted to the 
+    testserver instead of being copied to the current working directory.
+    By default it builds a noarch package; use -a to build an arch package
+    -b says submit to beaker
+EOF
+   exit 0
+}
+
+SOURCE_DIR=`pwd`
+ABI_OPTIONS=""
+
+while getopts "d:s:bah" opt; do
+   case $opt in
+
+   d )  SOURCE_DIR=$OPTARG ;;
+   s )  TESTSERVER=$OPTARG ;;
+   b )  BEAKER="BEAKER" ;;
+   a )  ABI_OPTIONS="--strict-abi" ;;
+   h )  echo "found $opt" ; usage ;;
+   \?)  usage ;;
+   esac
+done
+
+shift $(($OPTIND - 1))
+
+
+NAME=`rhts-mk-get-test-package-name $SOURCE_DIR`
+CURRENT_TAG=`rhts-mk-get-current-tag $SOURCE_DIR`
+
+VERSION=`rhts-mk-get-version-info -v $CURRENT_TAG`
+RELEASE=`rhts-mk-get-version-info -r $CURRENT_TAG`
+echo "           CURRENT_TAG: $CURRENT_TAG"
+echo "                  NAME: $NAME"
+echo "               VERSION: $VERSION"
+echo "               RELEASE: $RELEASE"
+echo "            SOURCE_DIR: $SOURCE_DIR"
+
+# TMP_DIR: do everything for this run under a unique temp directory
+TMP_DIR=`mktemp -d /tmp/rhts-build-XXXXXXXX` || exit 1
+echo "               TMP_DIR: $TMP_DIR"
+
+# BUILD_DIR: the build directory for rpmbuild operations (to avoid needing root permission)
+BUILD_DIR=$TMP_DIR/rpm-build
+echo "             BUILD_DIR: $BUILD_DIR"
+mkdir $BUILD_DIR || exit 1
+
+# GENERATED_SOURCE_DIR: 
+# this directory will contain the generated specfile and tarball
+GENERATED_SOURCE_DIR=$TMP_DIR/build
+echo "  GENERATED_SOURCE_DIR: $GENERATED_SOURCE_DIR"
+mkdir $GENERATED_SOURCE_DIR || exit 1
+
+# INSTALL_DIR: what is this?
+INSTALL_DIR=$TMP_DIR/install
+echo "           INSTALL_DIR: $INSTALL_DIR"
+mkdir $INSTALL_DIR || exit 1
+
+BASE_SPECFILE=/usr/share/rhts/lib/rhts-package-tests.spec.in
+GENERATED_SPECFILE=$GENERATED_SOURCE_DIR/$NAME-$VERSION-$RELEASE.spec
+TARBALL=$GENERATED_SOURCE_DIR/$NAME-$VERSION-$RELEASE.tar.gz
+TESTCOVERAGE=$GENERATED_SOURCE_DIR/testcoverage 
+
+echo "Creating tarball: $TARBALL"
+tar --exclude "CVS" --exclude ".svn" --exclude ".git" --exclude "rhts-.\*\.rpm" -zcvf $TARBALL --directory $SOURCE_DIR . || exit 1
+
+echo "Gathering testinfo.desc files:"
+# Extract tarball to a clean location and run "make testinfo.desc" in each location:
+EXTRACT_DIR=$TMP_DIR/extract-for-metadata
+echo "           EXTRACT_DIR: $EXTRACT_DIR"
+mkdir $EXTRACT_DIR || exit $?
+tar -zxvf $TARBALL --directory $EXTRACT_DIR/ || exit $?
+pushd $EXTRACT_DIR
+make testinfo.desc || exit $?
+popd
+
+echo "Generating specfile: $GENERATED_SPECFILE"
+find $EXTRACT_DIR -name testinfo.desc | rhts-mk-generate-specfile $ABI_OPTIONS $NAME $VERSION $RELEASE > $GENERATED_SPECFILE || exit $?
+
+echo "Building package:"
+rpmbuild  -bb --define "_builddir $BUILD_DIR" --define "_sourcedir $GENERATED_SOURCE_DIR"  --define "_rpmdir $INSTALL_DIR" $GENERATED_SPECFILE || exit 1
+
+#bpeck: if $(TESTSERVER) passed in then submit rpm.
+if [ -n "$TESTSERVER" ]; then
+    pushd $INSTALL_DIR
+    for RPM in $(find . -name \*.rpm); do
+        rhts-mk-test-import $TESTSERVER $RPM $VERSION-$RELEASE || exit 1
+    done
+    popd
+elif [ -n "$BEAKER" ]; then
+    pushd $INSTALL_DIR
+    for RPM in $(find . -name \*.rpm); do
+        bkr task-add $RPM
+    done
+    popd
+else
+    #GBN: copy rpm to cwd
+    cp $INSTALL_DIR/*/*.rpm .
+fi
+
+#rm -rf $TMP_DIR
+echo "Finished building test package"
+

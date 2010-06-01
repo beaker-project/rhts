@@ -1,0 +1,404 @@
+#!/usr/bin/python
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# is made available to anyone wishing to use, modify, copy, or 
+# redistribute it subject to the terms and conditions of the GNU General 
+# Public License v.2.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# Authors: Bill Peck, Paul Sutherland
+#
+
+import sys, getopt
+import xmlrpclib
+import string
+import os
+import pprint
+import commands
+import time
+import re
+import tempfile
+
+import rhts
+
+server = ''
+debug = 0
+temp_files = []
+
+USAGE_TEXT = """
+Usage:  rhts-db-submit-result [OPTIONS]
+where valid options are:
+  -S <server>, --server <server>: supply the server to talk to (leave out for a dry run)
+  -t <testname>, --testname <testname>: supply name for the test result
+  -T <recipetestid>:  server-side ID of instance of test within a recipe
+  -r <result>, --result <result>: specify the result (PASS, FAIL)
+  -v <result value>, --resultvalue <result value>: specify the optional numeric result of the test
+  -D <filename>, --dmesg <filename>:  read <filename> as dmesg
+  -l <filename>, --log <filename>: read <filename> as the test log
+  -d, --debug: show debugging information
+  -q <version>, --testversion <version>: supply the version of the test  
+"""
+
+# old way
+#def mktemp_file():
+#    global temp_files
+#    (ret_val, log_file) = commands.getstatusoutput("/bin/mktemp /tmp/tmp.XXXXXX")
+#    temp_files.append(log_file)
+#    return log_file
+
+# new & secure
+def mktemp_file():
+    global temp_files
+    (fh, f) = tempfile.mkstemp(prefix='tmp.rhts-db-submit-result.', dir='/tmp')
+    os.close(fh)
+    temp_files.append(f)
+    return f
+
+def cleanup():
+    global temp_files
+    for f in temp_files:
+        os.remove(f)
+
+def report_results(testname, parent_string, result, resultvalue, test_log, testversion,console_log,recipetestid):
+   if debug:
+      print "report_results:\n'%s','%s','%s','%s', %s,'%s','%s','%s'" % (testname, parent_string, result, resultvalue, test_log, testversion,console_log,recipetestid)
+
+   if not server:
+      return "(no server, assuming development run)"
+   else:
+      client = xmlrpclib.Server(server)
+      resp = None
+      while True:
+          try:
+             resp = client.results.result(testname, parent_string, result, resultvalue, testversion, recipetestid)
+             pprint.pprint(resp)
+             break
+          except:
+              print "Unable to connect to server, sleeping 5 seconds..."
+              time.sleep(5)
+      return resp
+
+def print_line():
+   print "---------------------------------------------------------"
+
+def is_fheader_first():
+    """
+    Decides whether to send file metadata before content.
+
+    Return value:
+        FALSE (anything evaluated by if as False): use default behavior
+        anything else: send metadata first.
+    """
+    return os.environ.get('CALLED_BY_BEAH')
+
+def report_log(log_type, recipetestid, result_id, log, log_name, testname):
+   global debug
+   if debug:
+         # Dry-run:
+         print_line()
+         print "Start of data for \"%s\":"%(log_type)
+         print_line()
+         print log
+         print_line()
+         print "...end of data for \"%s\""%(log_type)
+         print_line()      
+         
+   if server:
+      p = re.compile('/')
+      prettyname = "%s-%s-%s.log" % (result_id, log_type, p.sub('-',testname))
+      session = xmlrpclib.Server(server)
+      fmf = is_fheader_first()
+      if fmf:
+        resp = session.results.resultLog(log_type, result_id, prettyname)
+      rhts.uploadWrapper(session,log_name,recipetestid, prettyname)
+      if not fmf:
+        resp = session.results.resultLog(log_type, result_id, prettyname)
+      if(resp != 0) :
+         raise NameError, "ERROR: Filing resultLog...."
+
+
+def usage():
+    print USAGE_TEXT
+
+# Allow numeric as well as string result codes.
+def string2string(string):
+    if debug:
+       print "string2string: processing %s" % (string)
+    score = {}
+    score['PASS'] =  'Pass'
+    score['Pass'] =  'Pass'
+    score['pass'] =  'Pass'
+    score['FAIL'] =  'Fail'
+    score['Fail'] =  'Fail'
+    score['fail'] =  'Fail'
+    score['ABORTED'] =  'Abort'
+    score['Aborted'] =  'Abort'
+    score['ABORT'] =  'Abort'
+    score['Abort'] =  'Abort'
+    score['Abort LWD'] =  'Abort LWD'
+    score['Abort EWD'] =  'Abort EWD'
+    score['Abort Panic'] =  'Panic'
+    score['Panic'] =  'Panic'
+    score['panic'] =  'Panic'
+    score['WARNING'] =  'Warn'
+    score['Warning'] =  'Warn'
+    score['WARN'] =  'Warn'
+    score['Warn'] =  'Warn'
+    score['0'] =  'Pass'
+    score['1'] =  'Warn'
+    score['2'] =  'Fail'
+    score['3'] =  'Abort'
+    if score.has_key(string):
+      return score[string]
+    else:
+      return 'Warn'
+
+def parent_string(testname):
+    if debug:
+       print "parent_string: processing %s" % (testname)
+    parent_string = string.replace(os.path.dirname(testname),'\\','/')
+    return parent_string
+
+# read dmesg's data
+def read_file(filename):
+    if filename == "-":
+        data = sys.stdin.read() 
+    else :
+        FH = open(filename, "r")
+        data = FH.read()
+        FH.close()
+    return data
+
+# rotate /var/log/messages file
+def msg_rotate():
+    os.system ('/usr/sbin/logrotate -f /etc/logrotate.conf')
+    if debug:
+       print "Rotating the /var/log/messages file"
+        
+# Check for AVC Messages
+def avc_check(error_file, dmesg_file):
+   result = "PASS"
+   log_file = error_file
+   avc_data = ""
+   
+   #If ausearch is installed check it
+   (ret_val, data) = commands.getstatusoutput("/usr/bin/which ausearch")
+   if ret_val / 256 == 0:
+
+      #Get time
+      if error_file == "+no_file":
+         avc_data += "Warning: AVC_ERROR environment variable not defined.  Using epoch as start time\n"
+         log_file = mktemp_file()
+         str = "/sbin/ausearch -sv no -m AVC -m USER_AVC -m SELINUX_ERR"
+      else:
+         t = time.localtime(os.path.getmtime(error_file))
+         str = "/sbin/ausearch -sv no -m AVC -m USER_AVC -m SELINUX_ERR -ts %d/%d/%d %d:%d:%d" % (t[1],t[2],t[0],t[3],t[4],t[5])
+      avc_data += str+"\n"
+         
+      #Run ausearch
+      (ret_val, data) = commands.getstatusoutput(str)
+      avc_data += data + "\n"
+      
+      #Check ausearch's return value (0 if AVC's, 1 if no AVC's)
+      if ret_val / 256 == 0:
+         result = "FAIL"
+      else: 
+         avc_data += "No AVC messages found with %s\n" % (str)
+   else:
+      avc_data += "Warning: /sbin/ausearch is not installed.  Only checking dmesg for AVC's\n"
+
+   #Find AVC's and ignore granted AVC's in dmesg
+   str = "/bin/grep avc: %s | /bin/grep --invert-match granted" % (dmesg_file,)
+   avc_data += str+"\n"
+   (ret_val, data) = commands.getstatusoutput(str)
+   data_l = data.split("\n")
+   if ret_val / 256 == 0 and len(data_l) > 0:
+
+      expression = re.compile('audit\((?P<time>\d*)\.\d*:\d*\): avc:  denied')
+
+      while len(data_l) != 0:
+         #Get time
+         m = expression.match(data_l[0])
+         if m == None:
+            if result == "PASS":
+               result = "WARN"
+            data_l += ["Warning: Unable to parse timestamp"]
+            break
+
+         #If greater than time stamp break
+         if os.path.getmtime(error_file) < float(m.group('time')):
+            break
+
+         #Else remove from list
+         data_l = data_l[1:]
+         
+      if len(data_l) != 0:
+         avc_data += "Following messages were found in dmesg:\n"
+         result="FAIL"
+         avc_data += "\n".join(data_l) + "\n"
+      else:
+         avc_data += "No AVC messages found in dmesg\n"
+   else:
+      avc_data += "No AVC messages found in dmesg\n"
+
+
+   #Sleep for 1 sec so avc denied messages will have differentiable time stamps
+   time.sleep(1)
+
+   #Write to log_file (and record timestamp)
+   LF = open(log_file, 'w')
+   LF.write(avc_data)
+   LF.close( )
+
+   return (result, log_file, dmesg_file)
+
+# Check for error messages in dmesg
+def check_for_errors(dmesg_file):
+    result = "PASS"
+    dmesg_log_file = mktemp_file()
+
+    dmesg_data = "Checking dmesg for specific failures!\n"
+   
+    #Find error messages in dmesg
+    (ret_val, data) = commands.getstatusoutput("/bin/cat %s | /bin/grep -f /usr/share/rhts/failurestrings | grep -v -f /usr/share/rhts/falsestrings" % (dmesg_file))
+    if len(data) > 0:
+       data_l = data.split("\n")
+    else:
+       data_l = []
+
+    if len(data_l) != 0:
+       result="FAIL"
+       dmesg_data = dmesg_data + "\n".join(data_l)
+       dmesg_data = dmesg_data + "\n"
+
+       dmesg_data = dmesg_data + "End of log.\n"
+
+       #Write to dmesg_log_file
+       LF = open(dmesg_log_file, 'w')
+       LF.write(dmesg_data)
+       LF.close( )
+
+    if debug:
+       print "result: %s dmesg_data: %s" % (result, dmesg_log_file)
+
+    return (result, dmesg_log_file)
+
+def main():
+    global server
+    global debug
+    
+    dmesg=None
+    dmesgfile=None
+    log=None
+    logfile=None
+    recipetestid=None
+    testname=None
+    result=None
+    resultvalue=0
+    testversion=None
+    
+    args = sys.argv[1:]
+    #pprint.pprint(args)
+    try:
+        opts, args = getopt.getopt(args, 't:p:r:v:q:D:l:d:f:T:S:', ['testid=', 'dmesg=', 'log=', 'debug=', 'testname=', 'result=', 'resultvalue=', 'testversion=', 'server='])
+    except:
+        usage()
+        sys.exit(-1)
+    for opt, val in opts:
+        if opt in ('-T', '--testid'):
+            recipetestid = val
+        if opt in ('-D', '--dmesg'):
+            dmesgfile = val
+            dmesg = read_file(dmesgfile)
+        if opt in ('-l', '--log'):
+            logfile = val
+            if logfile == "-":
+                logfile = mktemp_file()
+                log = sys.stdin.read() 
+                LF = open(logfile, 'w')
+                LF.write(log)
+                LF.close( )
+            else:
+                log = read_file(logfile)
+        if opt in ('-t', '--testname'):
+            testname = val
+        if opt in ('-r', '--result'):
+            result = val
+        if opt in ('-v', '--resultvalue'):
+            resultvalue = val
+        if opt in ('-q', '--testversion'):
+            testversion = val
+        if opt in ('-S', '--server'):
+            server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % val
+        if opt in ('-d', '--debug'):
+            debug = val
+
+    console_log=''
+
+    result_id = report_results(testname, parent_string(testname), string2string(result), resultvalue, log, testversion,console_log,recipetestid)
+    print "%s result: %s" % (testname, result)
+    if resultvalue:
+       print "   metric: %s" % (resultvalue)
+    if log and result_id:
+       report_log('test_log', recipetestid, result_id, log, logfile, testname)
+       print "   Log: %s" % (logfile)
+    if dmesg and result_id:
+       report_log('console_dmesg', recipetestid, result_id, dmesg, dmesgfile, testname)
+       print "   DMesg: %s" % (dmesgfile)
+
+    #Check for dmesg errors
+    if dmesg:
+       (result, dmesgerrors)=check_for_errors(dmesgfile)
+       
+       #Report
+       if result != "PASS":
+          log=read_file(dmesgerrors)
+          testname=testname+"/dmesg"
+          result_id = report_results(testname, parent_string(testname), string2string(result), 0, log, testversion, '', recipetestid)
+          print "%s result: %s" % (testname, result)
+          report_log('test_log', recipetestid, result_id, log, dmesgerrors, testname)
+          print "   Log: %s" % (dmesgerrors)
+          msg_rotate()
+       
+    #Allow AVC check if AVC_ERROR undefined
+    if os.environ.get('AVC_ERROR') is None:
+       error_file="+no_file"
+    else:
+       error_file=os.environ.get('AVC_ERROR')
+    
+    #Report AVC Result
+    if error_file != "+no_avc_check":
+       
+       #Check for AVC's
+       (result, logfile, dmesgfile)=avc_check(error_file, dmesgfile)
+       if logfile:
+          log=read_file(logfile)
+       else:
+          log=None
+       if dmesgfile:
+          dmesg=read_file(dmesgfile)
+       else:
+          dmesg=None
+          
+       #Report
+       if result != "PASS":
+           testname=testname+"/avc"
+           result_id = report_results(testname, parent_string(testname), string2string(result), 0, log, testversion, '', recipetestid)
+           print "%s result: %s" % (testname, result)
+           if log:
+              report_log('test_log', recipetestid, result_id, log, logfile, testname)
+              print "   Log: %s" % (logfile)
+           if dmesg:
+              report_log('console_dmesg', recipetestid, result_id, dmesg, dmesgfile, testname)
+              print "   DMesg: %s" % (dmesgfile)
+
+if __name__ == '__main__':
+    main()
+    cleanup()
+    sys.exit(0)

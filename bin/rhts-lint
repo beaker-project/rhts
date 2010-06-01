@@ -1,0 +1,45 @@
+#!/usr/bin/python
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# is made available to anyone wishing to use, modify, copy, or 
+# redistribute it subject to the terms and conditions of the GNU General 
+# Public License v.2.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# Author: David Malcolm
+import fileinput
+import unittest
+
+# Use a hardcoded path for RHTS python modules for now:
+import sys
+sys.path.append('/usr/share/rhts/lib')
+
+import testinfo
+
+class __DeferredFileInputFilenameString:
+    """
+    The PrintingParser classes want to have a filename so they can give
+    useful error messages.
+
+    However, annoyingly, fileinput.filename() only returns a value once input
+    has been read from the string.
+
+    So this class exists so that you can pass a string-like object around,
+    and have the actual filename string generated later on, when needed, and when
+    fileinput.filename() will be generating good output.
+    """
+    def __str__(self):
+        return fileinput.filename()
+        
+if __name__=='__main__':
+    input = fileinput.input()
+    p = testinfo.StdoutParser(__DeferredFileInputFilenameString())
+    p.parse(input)
+    
+    

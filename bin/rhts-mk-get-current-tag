@@ -1,0 +1,51 @@
+#!/bin/sh
+# Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
+# is made available to anyone wishing to use, modify, copy, or 
+# redistribute it subject to the terms and conditions of the GNU General 
+# Public License v.2.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# Author: Greg Nichols
+#
+# determine the next available package tag for test package
+
+if [ $# -gt 1 ]; then
+	usage
+	exit 1
+fi
+
+if [ $# == 1 ]; then
+	pushd $1 > /dev/null
+fi
+
+PACKAGE_NAME=`rhts-mk-get-test-package-name`
+
+# for CVS, find the tag with the package name
+if [ -d "CVS" ]; then
+	CURRENT_TAG=`cvs -Q status -lv | grep -v '^?' | grep $PACKAGE_NAME | head -n 1  | awk '{print $1}'`
+fi
+
+# for svn, just use the svn repo revision number for the package revision number
+if [ -d ".svn" ]; then
+	CURRENT_VERSION=$(echo $TESTVERSION | sed -e 's/\./_/g')  # from the make file.
+	CURRENT_REVISION=`svn info | fgrep "Revision:" | awk '{print $2}'`
+	CURRENT_TAG="$PACKAGE_NAME-$CURRENT_VERSION-$CURRENT_REVISION"
+fi
+
+# for git, do the same thing we do for cvs
+if git log -1 &>/dev/null; then
+	CURRENT_TAG=$(ls -1t $(git rev-parse --git-dir)/refs/tags | grep $PACKAGE_NAME | head -n1)
+fi
+
+if [ $# == 1 ]; then
+	popd > /dev/null
+fi
+
+echo $CURRENT_TAG

@@ -1,0 +1,51 @@
+#!/bin/sh
+PATH=/sbin:/usr/sbin:$PATH
+
+SLABLOG=$(mktemp -p /mnt/testarea -t Slab.XXXXXX)
+
+function WatchFile ()
+{
+    FILE=$1
+
+    TMPFILE=$(mktemp -p /mnt/testarea -t Watch.XXXXX)
+    while true; do
+	diff=$(diff -q $FILE $TMPFILE)
+	rc=$?
+	if [ $rc != 0 ]; then
+	    echo "File is still growing.."
+	    cat $FILE > $TMPFILE
+	else
+	    rm $TMPFILE
+	    return 0
+	fi
+	sleep 2
+    done
+}
+
+function SysRq ()
+{
+    ACTION=$1
+    logger -p local2.info -t "List of $ACTION Tasks" Start
+    sleep 1
+    echo $ACTION > /proc/sysrq-trigger
+    WatchFile /var/log/messages
+    logger -p local2.info -t "List of $ACTION Tasks" Stop
+}
+
+# Get some system information from the system
+
+PROCLIST='m t w'
+
+for p in $PROCLIST ; do
+    # Dump a list of blocked tasks and their information
+    SysRq $p
+    sleep 2
+done
+
+# Send slab info to a file for logging
+timestamp=$(/bin/date '+%F %T')
+echo "Dumping slabinfo - Start - $timestamp" >> $SLABLOG
+cat /proc/slabinfo >> $SLABLOG
+timestamp=$(/bin/date '+%F %T')
+echo "Dumping slabinfo - Stop - $timestamp" >> $SLABLOG
+logger -p local2.info -t "SlabCacheInfo" -f $SLABLOG
