@@ -23,6 +23,10 @@ Group: Development/Libraries
 Obsoletes: rhts-rh-devel
 Provides: rhts-rh-devel
 
+%description devel
+This package contains components of the test system used when running 
+tests, either on a developer's workstation, or within a lab.
+
 %package test-env
 Summary: Testing API
 Group: Development/Libraries
@@ -73,17 +77,17 @@ ln -s rhts-submit-log $RPM_BUILD_ROOT/usr/bin/rhts_submit_log
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && [ -d $RPM_BUILD_ROOT ] && rm -rf $RPM_BUILD_ROOT;
 
-%post rhts
+%post test-env
 if [ "$1" -le "1" ] ; then # First install
 semodule -i %{_datadir}/selinux/packages/%{name}/rhts.pp 2>/dev/null || :
 fi
 
-%preun rhts
+%preun test-env
 if [ "$1" -lt "1" ] ; then # Final removal
 semodule -r rhts 2>/dev/null || :
 fi
 
-%postun rhts
+%postun test-env
 if [ "$1" -ge "1" ] ; then # Upgrade
 semodule -i %{_datadir}/selinux/packages/%{name}/rhts.pp 2>/dev/null || :
 fi
