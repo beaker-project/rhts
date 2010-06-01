@@ -118,7 +118,7 @@ fi
 %{_datadir}/%{name}/falsestrings
 %{_datadir}/selinux/packages/%{name}/rhts.pp
 %{python_sitelib}/%{name}/*
-%{python_sitelib}/%{name}/%{name}-*
+%{python_sitelib}/%{name}-*
 
 %files devel
 %defattr(-,root,root)
