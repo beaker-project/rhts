@@ -134,8 +134,8 @@ fi
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-tag-release
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-test-import
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-diff-since-last-tag
-%doc devel/doc/Makefile.template
-%doc devel/doc/runtest.sh.template
+%doc doc/Makefile.template
+%doc doc/runtest.sh.template
 
 %changelog
 * Tue Jun 01 2010 Bill Peck <bpeck@redhat.com> 4.0-0
