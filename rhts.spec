@@ -45,7 +45,7 @@ This package contains components of the test system used when running
 tests, either on a developer's workstation, or within a lab.
 
 %prep
-%setup -q -c 
+%setup -q
 
 
 %build
