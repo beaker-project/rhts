@@ -1,5 +1,5 @@
-%{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
-%{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
+%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+%{!?pyver: %global pyver %(%{__python} -c "import sys ; print sys.version[:3]")}
 
 Name: rhts
 Summary: Automated software testing
@@ -135,5 +135,5 @@ fi
 %doc devel/doc/runtest.sh.template
 
 %changelog
-* Tue Jun 01 2010 Bill Peck <bpeck@redhat.com> - 4.0
+* Tue Jun 01 2010 Bill Peck <bpeck@redhat.com> - 4.0-0
 - New rhts-devel
