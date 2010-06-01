@@ -50,7 +50,6 @@ tests, either on a developer's workstation, or within a lab.
 
 %build
 [ "$RPM_BUILD_ROOT" != "/" ] && [ -d $RPM_BUILD_ROOT ] && rm -rf $RPM_BUILD_ROOT;
-DESTDIR=$RPM_BUILD_ROOT make
 pushd python-modules
 CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
 popd
