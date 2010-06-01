@@ -112,11 +112,13 @@ fi
 %attr(0755, root, root)%{_bindir}/rhts-restore
 %attr(0755, root, root)%{_bindir}/rhts-system-info
 %attr(0755, root, root)%{_bindir}/rhts-abort
+%attr(0755, root, root)%{_bindir}/rhts-test-runner.sh
 %{_datadir}/%{name}/lib/rhts-make.include
 %{_datadir}/%{name}/failurestrings
 %{_datadir}/%{name}/falsestrings
 %{_datadir}/selinux/packages/%{name}/rhts.pp
 %{python_sitelib}/%{name}/*
+%{python_sitelib}/%{name}/%{name}-*
 
 %files devel
 %defattr(-,root,root)
