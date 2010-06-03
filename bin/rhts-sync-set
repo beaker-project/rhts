@@ -17,7 +17,7 @@
 import sys, getopt
 # xmlrpclib doesn't support timeouts
 #import xmlrpclib
-import timeout_xmlrpclib as xmlrpclib
+import rhts.timeout_xmlrpclib as xmlrpclib
 
 import string
 import os

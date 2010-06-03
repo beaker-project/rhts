@@ -20,7 +20,7 @@ import unittest
 import sys
 sys.path.append('/usr/share/rhts/lib')
 
-import testinfo
+import rhts.testinfo
 
 class __DeferredFileInputFilenameString:
     """
