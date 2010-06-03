@@ -119,8 +119,7 @@ fi
 %{_datadir}/%{name}/failurestrings
 %{_datadir}/%{name}/falsestrings
 %{_datadir}/selinux/packages/%{name}/rhts.pp
-%{python_sitelib}/%{name}/*
-%{python_sitelib}/%{name}-*
+%{python_sitelib}/%{name}*
 
 %files devel
 %defattr(-,root,root)
@@ -143,4 +142,4 @@ fi
 
 %changelog
 * Thu Jun 03 2010 Bill Peck <bpeck@redhat.com> 4.2-1
-- New rhts-devel
+- New rhts
