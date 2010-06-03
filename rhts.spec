@@ -136,6 +136,8 @@ fi
 %{_datadir}/selinux/packages/%{name}/rhts.pp
 %endif
 %{python_sitelib}/%{name}*
+/mnt/scratchspace
+%attr(1777,root,root)/mnt/testarea
 
 %files devel
 %defattr(-,root,root)

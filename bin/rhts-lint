@@ -15,11 +15,6 @@
 # Author: David Malcolm
 import fileinput
 import unittest
-
-# Use a hardcoded path for RHTS python modules for now:
-import sys
-sys.path.append('/usr/share/rhts/lib')
-
 import rhts.testinfo
 
 class __DeferredFileInputFilenameString:

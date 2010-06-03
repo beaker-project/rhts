@@ -17,9 +17,8 @@
 
 # Use a hardcoded path for RHTS python modules for now:
 import sys, xmlrpclib, os
-sys.path.append("/usr/share/rhts/lib")
 import rhts
-from rhts_workflow import Scheduler
+from rhts.rhts_workflow import Scheduler
 
 USAGE_TEXT = """
 Usage:

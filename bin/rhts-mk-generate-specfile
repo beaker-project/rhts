@@ -5,8 +5,7 @@ Tool to generate a specfile, based on a list of testinfo.desc filenames
 import sys
 import re
 
-sys.path.append('/usr/share/rhts/lib')
-import testinfo
+import rhts.testinfo
 
 def get_tarball_name(name, version, release):
     return "%s-%s-%s.tar.gz"%(name, version, release)
