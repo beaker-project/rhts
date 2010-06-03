@@ -3,8 +3,8 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.0
-Release: 0%{?dist}
+Version: 4.1
+Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
 Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
@@ -140,5 +140,5 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
-* Thu Jun 03 2010 Bill Peck <bpeck@redhat.com> 4.0-0
+* Thu Jun 03 2010 Bill Peck <bpeck@redhat.com> 4.1-1
 - New rhts-devel
