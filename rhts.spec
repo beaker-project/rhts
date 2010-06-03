@@ -140,5 +140,5 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
-* Tue Jun 01 2010 Bill Peck <bpeck@redhat.com> 4.0-0
+* Thu Jun 03 2010 Bill Peck <bpeck@redhat.com> 4.0-0
 - New rhts-devel
