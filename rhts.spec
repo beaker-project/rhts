@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.8
+Version: 4.9
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -161,5 +161,5 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
-* Thu Jun 03 2010 Bill Peck <bpeck@redhat.com> 4.8-1
+* Thu Jun 03 2010 Bill Peck <bpeck@redhat.com> 4.9-1
 - New rhts
