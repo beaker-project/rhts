@@ -11,6 +11,7 @@ Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildArch: noarch
 BuildRequires: python-devel
+BuildRequires: selinux-policy-devel
 
 %description
 This package is intended for people creating and maintaining tests, and
@@ -39,6 +40,7 @@ Provides: rhts-devel-test-env
 Obsoletes: rhts-legacy
 Provides: rhts-legacy
 Requires: beakerlib
+Requires(post): policycoreutils
 
 %description test-env
 This package contains components of the test system used when running 
