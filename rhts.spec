@@ -7,7 +7,7 @@ Version: 4.0
 Release: 0%{?dist}
 Group: Development/Libraries
 License: GPL
-Source0: %{name}-%{version}.tar.bz2
+Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildArch: noarch
 BuildRequires: python-devel
