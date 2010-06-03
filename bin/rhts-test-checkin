@@ -1,0 +1,44 @@
+#!/usr/bin/python
+
+import sys, xmlrpclib, syslog, os, time
+
+USAGE_TEXT = """
+Usage:
+    rhts-test-checkin <lab_server> <hostname> <jobid> <test> <killtime> <testid>
+"""
+def usage():
+    print USAGE_TEXT
+    sys.exit(-1)
+
+args = sys.argv[1:]
+if len(args) != 6:
+  print "ERROR: %s args provided" % (len(args))
+  usage()
+
+timetext = time.strftime('%m/%d/%y %H:%M:%S ', time.localtime(time.time()))
+
+lab_server = sys.argv[1]
+server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % (lab_server)
+hostname = sys.argv[2]
+jobid = sys.argv[3]
+test = sys.argv[4]
+killtime = sys.argv[5]
+testid = sys.argv[6]
+
+client = xmlrpclib.Server(server)
+while True:
+    try:
+        resp = client.watchdog.testCheckin(hostname, jobid, test, killtime, testid)
+        break
+    except:
+        print "Unable to connect to server, sleeping 5 seconds..."
+        time.sleep(5)
+
+# syslog the message
+syslog.syslog("JobID:%s Test:%s" % (jobid, test))
+# send it to the console as well
+fd = os.open("/dev/console", os.O_WRONLY)
+res = os.write(fd, "%s JobID:%s Test:%s Response:%s\n" % (timetext, jobid, test, resp))
+res = os.close(fd)
+if resp != 1:
+    sys.exit(1)

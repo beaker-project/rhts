@@ -127,6 +127,7 @@ fi
 %attr(0755, root, root)%{_bindir}/rhts-system-info
 %attr(0755, root, root)%{_bindir}/rhts-abort
 %attr(0755, root, root)%{_bindir}/rhts-test-runner.sh
+%attr(0755, root, root)%{_bindir}/rhts-test-checkin
 %{_datadir}/%{name}/lib/rhts-make.include
 %{_datadir}/%{name}/failurestrings
 %{_datadir}/%{name}/falsestrings
