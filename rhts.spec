@@ -80,6 +80,8 @@ ln -s rhts-environment.sh $RPM_BUILD_ROOT/usr/bin/rhts_environment.sh
 ln -s rhts-sync-set $RPM_BUILD_ROOT/usr/bin/rhts_sync_set
 ln -s rhts-sync-block $RPM_BUILD_ROOT/usr/bin/rhts_sync_block
 ln -s rhts-submit-log $RPM_BUILD_ROOT/usr/bin/rhts_submit_log
+mkdir -p $RPM_BUILD_ROOT/mnt/scratchspace
+mkdir -p $RPM_BUILD_ROOT/mnt/testarea
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && [ -d $RPM_BUILD_ROOT ] && rm -rf $RPM_BUILD_ROOT;
