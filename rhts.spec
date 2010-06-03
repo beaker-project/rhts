@@ -11,7 +11,9 @@ Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildArch: noarch
 BuildRequires: python-devel
+%if 0%{?rhel}{?fedora} > 4
 BuildRequires: selinux-policy-devel
+%endif
 
 %description
 This package is intended for people creating and maintaining tests, and
@@ -40,7 +42,9 @@ Provides: rhts-devel-test-env
 Obsoletes: rhts-legacy
 Provides: rhts-legacy
 Requires: beakerlib
+%if 0%{?rhel}{?fedora} > 4
 Requires(post): policycoreutils
+%endif
 
 %description test-env
 This package contains components of the test system used when running 
@@ -62,11 +66,13 @@ pushd python-modules
 %{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
 popd
 
+%if 0%{?rhel}{?fedora} > 4
 # Build RHTS Selinux Testing Policy 
 pushd selinux
 make -f %{_datadir}/selinux/devel/Makefile
 install -p -m 644 -D rhts.pp $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}/rhts.pp
 popd
+%endif
 
 # Legacy support.
 ln -s rhts-db-submit-result $RPM_BUILD_ROOT/usr/bin/rhts_db_submit_result
@@ -79,19 +85,25 @@ ln -s rhts-submit-log $RPM_BUILD_ROOT/usr/bin/rhts_submit_log
 [ "$RPM_BUILD_ROOT" != "/" ] && [ -d $RPM_BUILD_ROOT ] && rm -rf $RPM_BUILD_ROOT;
 
 %post test-env
+%if 0%{?rhel}{?fedora} > 4
 if [ "$1" -le "1" ] ; then # First install
 semodule -i %{_datadir}/selinux/packages/%{name}/rhts.pp 2>/dev/null || :
 fi
+%endif
 
 %preun test-env
+%if 0%{?rhel}{?fedora} > 4
 if [ "$1" -lt "1" ] ; then # Final removal
 semodule -r rhts 2>/dev/null || :
 fi
+%endif
 
 %postun test-env
+%if 0%{?rhel}{?fedora} > 4
 if [ "$1" -ge "1" ] ; then # Upgrade
 semodule -i %{_datadir}/selinux/packages/%{name}/rhts.pp 2>/dev/null || :
 fi
+%endif
 
 %files test-env
 %defattr(-,root,root)
@@ -118,7 +130,9 @@ fi
 %{_datadir}/%{name}/lib/rhts-make.include
 %{_datadir}/%{name}/failurestrings
 %{_datadir}/%{name}/falsestrings
+%if 0%{?rhel}{?fedora} > 4
 %{_datadir}/selinux/packages/%{name}/rhts.pp
+%endif
 %{python_sitelib}/%{name}*
 
 %files devel
