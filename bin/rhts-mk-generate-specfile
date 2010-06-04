@@ -119,7 +119,7 @@ def generate_specfile(testinfos, name, version, release, strictRequires, strictA
     print 
 
 def test():
-    ti = testinfo.parse_string("""\
+    ti = rhts.testinfo.parse_string("""\
     # Test comment
     Owner:        Jane Doe <jdoe@redhat.com>
     Name:         /examples/coreutils/example-simple-test
@@ -140,7 +140,7 @@ def test():
     generate_specfile([ti], name, version, release)
 
 def parse_file(filename):
-    p = testinfo.StderrParser(filename)
+    p = rhts.testinfo.StderrParser(filename)
     p.parse(open(filename).readlines())
     if p.numErrors>0:
         sys.exit(1)

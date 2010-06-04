@@ -34,7 +34,7 @@ class __DeferredFileInputFilenameString:
         
 if __name__=='__main__':
     input = fileinput.input()
-    p = testinfo.StdoutParser(__DeferredFileInputFilenameString())
+    p = rhts.testinfo.StdoutParser(__DeferredFileInputFilenameString())
     p.parse(input)
     
     
