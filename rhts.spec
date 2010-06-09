@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.10
+Version: 4.11
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -161,6 +161,9 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Wed Jun 09 2010 Bill Peck <bpeck@redhat.com> 4.11-1
+- tell ausearch to only look at the logs, ignore stdin (bpeck@redhat.com)
+
 * Fri Jun 04 2010 Bill Peck <bpeck@redhat.com> 4.10-1
 - add missing rhts namespace (bpeck@redhat.com)
 
