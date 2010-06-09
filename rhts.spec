@@ -25,7 +25,7 @@ Summary: Testing
 Group: Development/Libraries
 Obsoletes: rhts-rh-devel
 Provides: rhts-rh-devel
-Requires: rhts-test-env
+Requires: rhts-test-env = %{version}
 
 %description devel
 This package contains components of the test system used when running 
