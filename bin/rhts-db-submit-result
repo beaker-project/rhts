@@ -195,10 +195,10 @@ def avc_check(error_file, dmesg_file):
       if error_file == "+no_file":
          avc_data += "Warning: AVC_ERROR environment variable not defined.  Using epoch as start time\n"
          log_file = mktemp_file()
-         str = "/sbin/ausearch -sv no -m AVC -m USER_AVC -m SELINUX_ERR"
+         str = "/sbin/ausearch --input-logs -sv no -m AVC -m USER_AVC -m SELINUX_ERR"
       else:
          t = time.localtime(os.path.getmtime(error_file))
-         str = "/sbin/ausearch -sv no -m AVC -m USER_AVC -m SELINUX_ERR -ts %d/%d/%d %d:%d:%d" % (t[1],t[2],t[0],t[3],t[4],t[5])
+         str = "/sbin/ausearch --input-logs -sv no -m AVC -m USER_AVC -m SELINUX_ERR -ts %d/%d/%d %d:%d:%d" % (t[1],t[2],t[0],t[3],t[4],t[5])
       avc_data += str+"\n"
          
       #Run ausearch
