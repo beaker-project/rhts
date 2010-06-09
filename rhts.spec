@@ -25,6 +25,7 @@ Summary: Testing
 Group: Development/Libraries
 Obsoletes: rhts-rh-devel
 Provides: rhts-rh-devel
+Requires: rhts-test-env
 
 %description devel
 This package contains components of the test system used when running 
@@ -163,6 +164,7 @@ fi
 %changelog
 * Wed Jun 09 2010 Bill Peck <bpeck@redhat.com> 4.11-1
 - tell ausearch to only look at the logs, ignore stdin (bpeck@redhat.com)
+- add missing rhts_workflow (bpeck@redhat.com)
 
 * Fri Jun 04 2010 Bill Peck <bpeck@redhat.com> 4.10-1
 - add missing rhts namespace (bpeck@redhat.com)
