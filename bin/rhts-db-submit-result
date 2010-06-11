@@ -367,10 +367,13 @@ def main():
           msg_rotate()
        
     #Allow AVC check if AVC_ERROR undefined
-    if os.environ.get('AVC_ERROR') is None:
+    error_file = os.environ.get('AVC_ERROR')
+    if error_file is None:
+       print "   AVC_ERROR undefined. Using +no_file as default."
+       error_file = "+no_file"
+    elif error_file == '':
+       print "   AVC_ERROR empty. Using +no_file as default."
        error_file="+no_file"
-    else:
-       error_file=os.environ.get('AVC_ERROR')
     
     #Report AVC Result
     if error_file != "+no_avc_check":

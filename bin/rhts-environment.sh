@@ -18,14 +18,6 @@ if [ -z "$OUTPUTFILE" ]; then
         export OUTPUTFILE=`mktemp /tmp/tmp.XXXXXX`
 fi
 
-# Set a "well known" log name, so if the localwatchdog triggers
-#  we can still file OUTPUTFILE and get some results.
-if [ -h /tmp/current.log ]; then
-        ln -sf $OUTPUTFILE /tmp/current.log
-else
-        ln -s $OUTPUTFILE /tmp/current.log
-fi
-
 if [ -z "$TESTPATH" ]; then
    TESTVERSION="developer"
 else
@@ -57,6 +49,14 @@ touch $OUTPUTFILE
 #If we have rebooted we restore certain ENV variables from before..
 if [ -e "/var/cache/rhts/$TESTID/ENV" ]; then
     . /var/cache/rhts/$TESTID/ENV
+fi
+
+# Set a "well known" log name, so if the localwatchdog triggers
+#  we can still file OUTPUTFILE and get some results.
+if [ -h /tmp/current.log ]; then
+        ln -sf $OUTPUTFILE /tmp/current.log
+else
+        ln -s $OUTPUTFILE /tmp/current.log
 fi
 
 # this file is for sourcing in rhts test scripts
