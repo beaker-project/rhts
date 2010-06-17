@@ -16,10 +16,35 @@ import os.path
 import base64
 import OpenSSL.SSL
 import traceback
-try:
-    from hashlib import md5 as md5_constructor
-except ImportError:
-    from md5 import new as md5_constructor
+
+def get_digest_contructor():
+    dm = os.getenv('DIGEST_METHOD', 'md5').lower()
+    if dm == 'md5':
+        try:
+            import hashlib
+            return hashlib.md5
+        except ImportError:
+            import md5
+            return md5.new
+    elif dm in ('sha', 'sha1'):
+        try:
+            import hashlib
+            return hashlib.sha1
+        except ImportError:
+            import sha
+            return sha.new
+    else:
+        class NoDigest(object):
+            digest_size = 0
+            blocksize = 1
+            def __init__(self, str=''): pass
+            def update(self, str): return None
+            def hexdigest(self): return ""
+            def digest(self): return ""
+            def copy(self): return NoDigest()
+        if dm != 'no_digest':
+            print "WARNING: Not recognized DIGEST_METHOD %s" % (dm,)
+        return NoDigest
 
 SCHEDULER_API = 2.2
 
@@ -123,7 +148,8 @@ def uploadWrapper(session, localfile, recipetestid, name=None, callback=None, bl
     fo = file(localfile, "r")  #specify bufsize?
     totalsize = os.path.getsize(localfile)
     ofs = 0
-    md5sum = md5_constructor()
+    digest_constructor = get_digest_contructor()
+    digestor = digest_constructor()
     debug = False
     if callback:
         callback(0, totalsize, 0, 0, 0)
@@ -132,17 +158,17 @@ def uploadWrapper(session, localfile, recipetestid, name=None, callback=None, bl
             blocksize = totalsize - ofs
         lap = time.time()
         contents = fo.read(blocksize)
-        md5sum.update(contents)
+        digestor.update(contents)
         size = len(contents)
         data = base64.encodestring(contents)
         if size == 0:
             # end of file, use offset = -1 to finalize upload
             offset = -1
-            digest = md5sum.hexdigest()
+            digest = digestor.hexdigest()
             sz = ofs
         else:
             offset = ofs
-            digest = md5_constructor(contents).hexdigest()
+            digest = digest_constructor(contents).hexdigest()
             sz = size
         del contents
         tries = 0
