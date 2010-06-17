@@ -29,7 +29,7 @@ PACKAGE_NAME=`rhts-mk-get-test-package-name`
 
 # for CVS, find the tag with the package name
 if [ -d "CVS" ]; then
-	CURRENT_TAG=`cvs -Q status -lv | grep -v '^?' | grep $PACKAGE_NAME | head -n 1  | awk '{print $1}'`
+	CURRENT_TAG=`cvs -Q status -lv | grep -v '^?' | grep -E "${PACKAGE_NAME}-([0-9_\-]+)" | head -n 1  | awk '{print $1}'`
 fi
 
 # for svn, just use the svn repo revision number for the package revision number
@@ -41,7 +41,7 @@ fi
 
 # for git, do the same thing we do for cvs
 if git log -1 &>/dev/null; then
-	CURRENT_TAG=$(ls -1t $(git rev-parse --git-dir)/refs/tags | grep $PACKAGE_NAME | head -n1)
+	CURRENT_TAG=$(ls -1t $(git rev-parse --git-dir)/refs/tags | grep -E "${PACKAGE_NAME}-([0-9_\-]+)" | head -n1)
 fi
 
 if [ $# == 1 ]; then
