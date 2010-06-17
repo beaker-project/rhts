@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.14
+Version: 4.15
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -162,6 +162,11 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Thu Jun 17 2010 Bill Peck <bpeck@redhat.com> 4.15-1
+- Include Marians patch for md5/sha/none.  Allows FIPS testing to work.
+  (bpeck@redhat.com)
+- bz605360 prevent rhts-mk-get-current-tag from confusing (bpeck@redhat.com)
+
 * Fri Jun 11 2010 Bill Peck <bpeck@redhat.com> 4.14-1
 - sync up with 108 (bpeck@redhat.com)
 
