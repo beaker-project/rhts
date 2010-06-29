@@ -84,7 +84,7 @@ OUTPUTFILE=`mktemp /tmp/tmp.XXXXXX`
 # Don't export our OUTPUTFILE to the test were running.
 export -n OUTPUTFILE
 
-if [ ! -e "$TESTPATH/Makefile" ] || [ ! -e "$TESTPATH/runtest.sh" ]; then
+if [ ! -e "$TESTPATH/Makefile" ] && [ ! -e "$TESTPATH/runtest.sh" ]; then
    INSTALLTESTRPMNAME=$(echo $TESTRPMNAME | sed -e 's/\.rpm$//')
    # Older yum seems to have busted cache logic.
    /bin/rm -rf /var/cache/yum/rhts-noarch
