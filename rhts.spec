@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.16
+Version: 4.17
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -163,6 +163,9 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Tue Jul 13 2010 Bill Peck <bpeck@redhat.com> 4.17-1
+- Update to require beaker-client (bpeck@redhat.com)
+
 * Tue Jun 29 2010 Bill Peck <bpeck@redhat.com> 4.16-1
 - fix rhts-test-runner.sh logic. (bpeck@redhat.com)
 
