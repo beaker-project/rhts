@@ -26,6 +26,7 @@ Group: Development/Libraries
 Obsoletes: rhts-rh-devel
 Provides: rhts-rh-devel
 Requires: rhts-test-env = %{version}
+Requires: beaker-client
 
 %description devel
 This package contains components of the test system used when running 
