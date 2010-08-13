@@ -65,6 +65,21 @@ function report_result {
 	rhts-report-result $1 $2 $OUTPUTFILE $3
 }
 
+function runuser_ {
+	$(which runuser 2>/dev/null || which /sbin/runuser 2>/dev/null || echo /bin/su) "$@"
+}
+
+function runas_ {
+	local user=$1 cmd=$2
+	if [ -n "$user" ]; then
+		echo "As $user: "
+		HOME=$(eval "echo ~$user") LOGNAME=$user USER=$user runuser_ -m -c "$cmd" $user
+	else
+		echo "As $(whoami): "
+		$cmd
+	fi
+}
+
 #
 # Do a startup test of a program
 # Assumption is that the program will wait for user input so we'll

@@ -84,16 +84,9 @@ fi
 
 {
 	echo -n "Running $ARG_EXECUTABLE_NAME "
-        if [ -n "$user" ]; then
-            echo "As $user: "
-            HOME=$(eval "echo ~$user") LOGNAME=$user USER=$user /bin/su -m $user -c "$ARG_EXECUTABLE_NAME $ARG_EXECUTABLE_ARGS"
-        else
-            echo " As $(whoami): "
-	    $ARG_EXECUTABLE_NAME $ARG_EXECUTABLE_ARGS
-        fi
+	runas_ "$user" "$ARG_EXECUTABLE_NAME $ARG_EXECUTABLE_ARGS"
 	EXIT_CODE=$?
 	echo "$EXIT_CODE" > $TMPFILE
-
 	echo "...finished running $ARG_EXECUTABLE_NAME, exit code=$EXIT_CODE"
 } 2>&1 | tee -a $OUTPUTFILE
 
