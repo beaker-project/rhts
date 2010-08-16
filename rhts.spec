@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.17
+Version: 4.18
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -163,6 +163,9 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Mon Aug 16 2010 Marian Csontos <mcsontos@redhat.com> 4.18-1
+- BZ616455 - Report all AVC denials (ebenes@redhat.com)
+
 * Tue Jul 13 2010 Bill Peck <bpeck@redhat.com> 4.17-1
 - Update to require beaker-client (bpeck@redhat.com)
 
