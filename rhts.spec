@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.19
+Version: 4.20
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -163,6 +163,9 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Fri Aug 27 2010 Marian Csontos <mcsontos@redhat.com> 4.20-1
+- PartialRevert "BZ616455 - Report all AVC denials" (mcsontos@redhat.com)
+
 * Tue Aug 24 2010 Marian Csontos <mcsontos@redhat.com> 4.19-1
 - Use runuser instead of su (mcsontos@redhat.com)
 
