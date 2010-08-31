@@ -180,12 +180,69 @@ def msg_rotate():
     os.system ('/usr/sbin/logrotate -f /etc/logrotate.conf')
     if debug:
        print "Rotating the /var/log/messages file"
-        
+
+
+# check log_file for AVC Messages:
+def avc_grep(log_file, avc_since, log_file_str=None):
+    if not log_file_str:
+        log_file_str = log_file
+    if not os.path.exists(log_file):
+        print "   Warning: no such file: %s" % log_file_str
+        return ("PASS", "")
+    result = "PASS"
+    avc_data = ""
+    #Find AVC's and ignore granted AVC's in log_file
+    str = "/bin/grep avc: %s | /bin/grep --invert-match granted" % (log_file,)
+    avc_data += str+"\n"
+    (ret_val, data) = commands.getstatusoutput(str)
+    data_l = data.split("\n")
+    if ret_val / 256 == 0 and len(data_l) > 0:
+
+        expression = re.compile('audit\((?P<time>\d*)\.\d*:\d*\): avc:  denied')
+
+        if avc_since:
+            while len(data_l) != 0:
+                #Get time
+                m = expression.match(data_l[0])
+                if m == None:
+                    result = "WARN"
+                    data_l += ["Warning: Unable to parse timestamp"]
+                    break
+
+                #If greater than time stamp break
+                if avc_since <= float(m.group('time')):
+                    break
+
+                #Else remove from list
+                data_l = data_l[1:]
+
+        if len(data_l) != 0:
+            avc_data += "Following messages were found in %s:\n" % log_file_str
+            result="FAIL"
+            avc_data += "\n".join(data_l) + "\n"
+        else:
+            avc_data += "No AVC messages found in %s\n" % log_file_str
+    else:
+        avc_data += "No AVC messages found in %s\n" % log_file_str
+    return (result, avc_data)
+
+
 # Check for AVC Messages
 def avc_check(error_file, dmesg_file):
    result = "PASS"
-   log_file = error_file
    avc_data = ""
+
+   if error_file == "+no_file":
+      avc_since = None
+      log_file = mktemp_file()
+      msg = "Warning: AVC_ERROR environment variable not defined.  Using epoch as start time\n"
+      print "   ", msg
+      avc_data += msg
+   else:
+      avc_since = os.path.getmtime(error_file)
+      print "   Info: Searching AVC errors produced since %s (%s)" % (avc_since,
+              time.asctime(avc_since))
+      log_file = error_file
    
    #If ausearch is installed check it
    (ret_val, data) = commands.getstatusoutput("/usr/bin/which ausearch")
@@ -193,11 +250,9 @@ def avc_check(error_file, dmesg_file):
 
       #Get time
       if error_file == "+no_file":
-         avc_data += "Warning: AVC_ERROR environment variable not defined.  Using epoch as start time\n"
-         log_file = mktemp_file()
          str = "/sbin/ausearch -sv no -m AVC -m USER_AVC -m SELINUX_ERR < /dev/null"
       else:
-         t = time.localtime(os.path.getmtime(error_file))
+         t = time.localtime(avc_since)
          # MM/DD/YYYY may not be correct if non en_* locale is used. Always use en_US for consistency: 
          str = "/usr/bin/env LC_ALL=en_US.UTF-8 /sbin/ausearch -sv no -m AVC -m USER_AVC -m SELINUX_ERR -ts %d/%d/%d %d:%d:%d < /dev/null" % (t[1],t[2],t[0],t[3],t[4],t[5])
       avc_data += str+"\n"
@@ -209,45 +264,29 @@ def avc_check(error_file, dmesg_file):
       #Check ausearch's return value (0 if AVC's, 1 if no AVC's)
       if ret_val / 256 == 0:
          result = "FAIL"
-      else: 
-         avc_data += "No AVC messages found with %s\n" % (str)
-   else:
-      avc_data += "Warning: /sbin/ausearch is not installed.  Only checking dmesg for AVC's\n"
-
-   #Find AVC's and ignore granted AVC's in dmesg
-   str = "/bin/grep avc: %s | /bin/grep --invert-match granted" % (dmesg_file,)
-   avc_data += str+"\n"
-   (ret_val, data) = commands.getstatusoutput(str)
-   data_l = data.split("\n")
-   if ret_val / 256 == 0 and len(data_l) > 0:
-
-      expression = re.compile('audit\((?P<time>\d*)\.\d*:\d*\): avc:  denied')
-
-      while len(data_l) != 0:
-         #Get time
-         m = expression.match(data_l[0])
-         if m == None:
-            if result == "PASS":
-               result = "WARN"
-            data_l += ["Warning: Unable to parse timestamp"]
-            break
-
-         #If greater than time stamp break
-         if os.path.getmtime(error_file) < float(m.group('time')):
-            break
-
-         #Else remove from list
-         data_l = data_l[1:]
-         
-      if len(data_l) != 0:
-         avc_data += "Following messages were found in dmesg:\n"
-         result="FAIL"
-         avc_data += "\n".join(data_l) + "\n"
       else:
-         avc_data += "No AVC messages found in dmesg\n"
+         if data == "<no matches>":
+            msg = "No AVC messages found with %s\n" % (str)
+            print "   Info:", msg
+            avc_data += msg
+         else:
+            avc_data += "Warning: ausearch command failed. Output:\n%s\n" % (data,)
+            (result, tmpdata) = avc_grep("/var/log/audit/audit.log", avc_since, log_file_str="audit.log")
+            if result != "FAIL":
+               result = "WARN"
+            avc_data += tmpdata
    else:
-      avc_data += "No AVC messages found in dmesg\n"
+      msg = "Warning: /sbin/ausearch is not installed. Performing builtin audit.log search...\n"
+      print "   ", msg
+      avc_data += msg
+      (result, tmpdata) = avc_grep("/var/log/audit/audit.log", avc_since, log_file_str="audit.log")
+      avc_data += tmpdata
 
+   (tmpres, tmpdata) = avc_grep(dmesg_file, avc_since, log_file_str="dmesg")
+   if tmpres != "PASS":
+      if result != "FAIL":
+         result = tmpres
+      avc_data += tmpdata
 
    #Sleep for 1 sec so avc denied messages will have differentiable time stamps
    time.sleep(1)
@@ -342,15 +381,15 @@ def main():
 
     console_log=''
 
-    result_id = report_results(testname, parent_string(testname), string2string(result), resultvalue, log, testversion,console_log,recipetestid)
+    the_result_id = report_results(testname, parent_string(testname), string2string(result), resultvalue, log, testversion,console_log,recipetestid)
     print "%s result: %s" % (testname, result)
     if resultvalue:
        print "   metric: %s" % (resultvalue)
-    if log and result_id:
-       report_log('test_log', recipetestid, result_id, log, logfile, testname)
+    if log and the_result_id:
+       report_log('test_log', recipetestid, the_result_id, log, logfile, testname)
        print "   Log: %s" % (logfile)
-    if dmesg and result_id:
-       report_log('console_dmesg', recipetestid, result_id, dmesg, dmesgfile, testname)
+    if dmesg and the_result_id:
+       report_log('console_dmesg', recipetestid, the_result_id, dmesg, dmesgfile, testname)
        print "   DMesg: %s" % (dmesgfile)
 
     #Check for dmesg errors
@@ -401,6 +440,10 @@ def main():
            if dmesg:
               report_log('console_dmesg', recipetestid, result_id, dmesg, dmesgfile, testname)
               print "   DMesg: %s" % (dmesgfile)
+       else:
+           if log:
+              report_log('avc_log', recipetestid, the_result_id, log, logfile, testname)
+              print "   AvcLog: %s" % (logfile)
 
 if __name__ == '__main__':
     main()
