@@ -241,7 +241,7 @@ def avc_check(error_file, dmesg_file):
    else:
       avc_since = os.path.getmtime(error_file)
       print "   Info: Searching AVC errors produced since %s (%s)" % (avc_since,
-              time.asctime(avc_since))
+              time.asctime(time.localtime(avc_since)))
       log_file = error_file
    
    #If ausearch is installed check it
