@@ -198,9 +198,9 @@ def avc_grep(log_file, avc_since, log_file_str=None):
     data_l = data.split("\n")
     if ret_val / 256 == 0 and len(data_l) > 0:
 
-        expression = re.compile('audit\((?P<time>\d*)\.\d*:\d*\): avc:  denied')
-
         if avc_since:
+            expression = re.compile('audit\((?P<time>\d*)\.\d*:\d*\): avc:  denied')
+
             while len(data_l) != 0:
                 #Get time
                 m = expression.match(data_l[0])
@@ -252,9 +252,10 @@ def avc_check(error_file, dmesg_file):
       if error_file == "+no_file":
          str = "/sbin/ausearch -sv no -m AVC -m USER_AVC -m SELINUX_ERR < /dev/null"
       else:
-         t = time.localtime(avc_since)
-         # MM/DD/YYYY may not be correct if non en_* locale is used. Always use en_US for consistency: 
-         str = "/usr/bin/env LC_ALL=en_US.UTF-8 /sbin/ausearch -sv no -m AVC -m USER_AVC -m SELINUX_ERR -ts %d/%d/%d %d:%d:%d < /dev/null" % (t[1],t[2],t[0],t[3],t[4],t[5])
+         # MM/DD/YYYY may not be correct if non en_* locale is used. Always use
+         # en_US for consistency:
+         ts = time.strftime("%m/%d/%Y %H:%M:%S", time.localtime(avc_since))
+         str = "/usr/bin/env LC_ALL=en_US.UTF-8 /sbin/ausearch -sv no -m AVC -m USER_AVC -m SELINUX_ERR -ts %s < /dev/null" % ts
       avc_data += str+"\n"
          
       #Run ausearch
