@@ -137,17 +137,19 @@ def _callMethod(session, name, args, kwargs):
         time.sleep(interval)
     raise RetryError, "reached maximum number of retries, last call failed with: %s" % ''.join(traceback.format_exception_only(*sys.exc_info()[:2]))
 
-def uploadWrapper(session, localfile, recipetestid, name=None, callback=None, blocksize=262144):
+def uploadWrapper(session, localfile, recipetestid, name=None, callback=None, blocksize=262144, start=0):
     """upload a file in chunks using the uploadFile call"""
     # XXX - stick in a config or something
     debug = 1
-    start=time.time()
+    started=time.time()
     retries=3
     if name is None:
         name = os.path.basename(localfile)
     fo = file(localfile, "r")  #specify bufsize?
     totalsize = os.path.getsize(localfile)
-    ofs = 0
+    ofs = start
+    if ofs != 0:
+        fo.seek(ofs)
     digest_constructor = get_digest_contructor()
     digestor = digest_constructor()
     debug = False
@@ -189,7 +191,7 @@ def uploadWrapper(session, localfile, recipetestid, name=None, callback=None, bl
         t1 = now - lap
         if t1 <= 0:
             t1 = 1
-        t2 = now - start
+        t2 = now - started
         if t2 <= 0:
             t2 = 1
         if debug:

@@ -1,12 +1,61 @@
 #!/bin/sh
 export PATH=/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/X11R6/bin:/root/bin
 
+function sizeof() {
+    # sizeof FILE -- returns FILE's size in bytes
+    if [[ -z $1 ]]; then
+        return 1
+    fi
+    stat --format="%s" $1
+}
+
+function diffat() {
+    # diffat FILE1 FILE2 -- returns first offset where FILE1 and FILE2 differ
+    if [[ -z $1 || -z $2 ]]; then
+        return 1
+    fi
+    local file1=$1 file2=$2
+    shift 2
+    local data=$(cmp $file1 $file2 2>&1)
+    if echo "$data" | grep '^cmp: EOF on ' &>/dev/null; then
+        # cmp: EOF on FILE
+        sizeof $(echo "$data" | sed -ne 's/^cmp: EOF on \(.*\)/\1/p')
+    elif echo "$data" | grep 'differ: byte ' &>/dev/null; then
+        # FILE1 FILE2 differ: byte 6, line 1
+        expr $(echo "$data" | sed -ne 's/.* differ: byte \([1-9][0-9]*\), line \([1-9][0-9]*\)$/\1/p') - 1
+    else
+        return 1
+    fi
+}
+
+function submit_testout() {
+    local start=0
+    declare -i start=0
+    if [[ ! -f /tmp/TESTOUT.log ]]; then
+        return 0
+    fi
+    mkdir /tmp/rhts &>/dev/null
+    # the file is still growing: make a copy first
+    cp /tmp/TESTOUT.log /tmp/rhts/TESTOUT.log
+    if [[ -f /tmp/_TESTOUT.log ]]; then
+      if cmp -s /tmp/rhts/TESTOUT.log /tmp/_TESTOUT.log; then
+          # files do not differ - nothing to upload
+          return 0
+      fi
+      start=$(diffat /tmp/rhts/TESTOUT.log /tmp/_TESTOUT.log)
+    fi
+    rhts-submit-log -l /tmp/rhts/TESTOUT.log --start="$start"
+    rm /tmp/_TESTOUT.log
+    mv /tmp/rhts/TESTOUT.log /tmp/_TESTOUT.log
+}
+
 function report_finish {
     logger -s "$0 report_finish start..."
     # upload the STDOUT/STDERR of the just run test
-    rhts-submit-log -l /tmp/TESTOUT.log
+    submit_testout
     # Clear the log
     > /tmp/TESTOUT.log
+    rm -f /tmp/_TESTOUT.log
     [ -n "$OUTPUTFILE" ] && cat $OUTPUTFILE
     export TESTORDER=$(expr $TESTORDER + 1)
     rhts-sync-set -s DONE
@@ -126,11 +175,11 @@ else
                 logger -s "$timestamp $0 $UPTIMEKILL $uptime hearbeat..."
             fi
             # Upload log every 5 minutes
-            if [ $(expr $uptime % 300) = 0 ]; then
+            if [ $(expr $uptime % ${UPLOAD_SECONDS:-300}) = 0 ]; then
                 # upload the STDOUT/STDERR of the currently running test
                 timestamp=$(/bin/date '+%F %T')
 		echo -e "\nMARK-LWD-LOOP -- $timestamp --" >> /tmp/TESTOUT.log
-		rhts-submit-log -l /tmp/TESTOUT.log
+                submit_testout
             fi
             # Sleep for a specified time then wake up to kill the child process.
             if [ "$uptime" -ge "$UPTIMEKILL" ]; then

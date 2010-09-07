@@ -29,9 +29,9 @@ USAGE_TEXT = """
 Usage:  rhts-submit-log -T <recipetestid> -l <logfile>
 """
 
-def report_log(recipetestid, logname):
+def report_log(recipetestid, logname, start=0):
    session = xmlrpclib.Server(result_server)
-   rhts.uploadWrapper(session, logname, recipetestid)
+   rhts.uploadWrapper(session, logname, recipetestid, start=start)
 
 
 def usage():
@@ -52,9 +52,10 @@ def main():
     logpath = ''
     logname = ''
     logdata = ''
+    start = 0
     args = sys.argv[1:]
     try:
-        opts, args = getopt.getopt(args, 'l:T:S:', ['server='])
+        opts, args = getopt.getopt(args, 'l:T:S:s:', ['server=', 'start='])
     except:
         usage()
     for opt, val in opts:
@@ -64,6 +65,9 @@ def main():
             logname = val
         if opt in ('-S', '--server'):
             result_server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % val
+        if opt in ('-s', '--start'):
+            start = int(val)
+            assert start >= 0, "start must be greater or equall zero."
 
     if not logname:
         print "You must sepcify a logfile with the -l switch"
@@ -77,7 +81,7 @@ def main():
         if not recipetestid:
            print "You must sepcify a recipetestid with the -T switch"
            sys.exit(1)
-        report_log(recipetestid, logname)
+        report_log(recipetestid, logname, start=start)
 
 
 if __name__ == '__main__':
