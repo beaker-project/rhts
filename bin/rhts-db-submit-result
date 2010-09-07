@@ -45,6 +45,24 @@ where valid options are:
   -q <version>, --testversion <version>: supply the version of the test  
 """
 
+# tempfile.mkstemp compatibility:
+if not hasattr(tempfile, "mkstemp"):
+    def _mkstemp(suffix='', prefix=None, dir=None, text=False):
+        """Helper implementation of tempfile.mkstemp for Python 2.2
+        """
+        fh = -1
+        fn = None
+        while fh < 0:
+            fn = tempfile.mktemp(suffix)
+            attr = os.O_RDWR | os.O_CREAT | os.O_EXCL | \
+                   getattr(os, "O_NOINHERIT", 0) | \
+                   getattr(os, "O_NOFOLLOW", 0)
+            if not text:
+                attr = attr | getattr(os, "O_BINARY", 0)
+                fh = os.open(fn, attr, 0600)
+        return (fh, fn)
+    tempfile.mkstemp = _mkstemp
+
 # old way
 #def mktemp_file():
 #    global temp_files
