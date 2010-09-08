@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.21
+Version: 4.22
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -163,6 +163,12 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Wed Sep 08 2010 Bill Peck <bpeck@redhat.com> 4.22-1
+- Merge branch 'TESTOUT' (mcsontos@redhat.com)
+- Make prev. TESTOUT patch prettier (mcsontos@redhat.com)
+- fix rhts-db-submit-result mkstemp on rhel3. (bpeck@redhat.com)
+- Fixed re-sending TESTOUT.log (mcsontos@redhat.com)
+
 * Wed Sep 01 2010 Marian Csontos <mcsontos@redhat.com> 4.21-1
 - Fixed wrong timestamp format
 - Improved AVC logging.
