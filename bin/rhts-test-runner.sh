@@ -45,8 +45,7 @@ function submit_testout() {
       start=$(diffat /tmp/rhts/TESTOUT.log /tmp/_TESTOUT.log)
     fi
     rhts-submit-log -l /tmp/rhts/TESTOUT.log --start="$start"
-    rm /tmp/_TESTOUT.log
-    mv /tmp/rhts/TESTOUT.log /tmp/_TESTOUT.log
+    mv -f /tmp/rhts/TESTOUT.log /tmp/_TESTOUT.log
 }
 
 function report_finish {
