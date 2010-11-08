@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.22
+Version: 4.23
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -163,6 +163,10 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Mon Nov 08 2010 Bill Peck <bpeck@redhat.com> 4.23-1
+- bz640395  -  make bkradd does not work (bpeck@redhat.com)
+- Added: Environment and RhtsOptions to metadata (mcsontos@redhat.com)
+
 * Wed Sep 08 2010 Bill Peck <bpeck@redhat.com> 4.22-1
 - Merge branch 'TESTOUT' (mcsontos@redhat.com)
 - Make prev. TESTOUT patch prettier (mcsontos@redhat.com)
