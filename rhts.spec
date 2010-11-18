@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.23
+Version: 4.24
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -163,6 +163,9 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Thu Nov 18 2010 Bill Peck <bpeck@redhat.com> 4.24-1
+- make it work with python2.7 (bpeck@redhat.com)
+
 * Mon Nov 08 2010 Bill Peck <bpeck@redhat.com> 4.23-1
 - bz640395  -  make bkradd does not work (bpeck@redhat.com)
 - Added: Environment and RhtsOptions to metadata (mcsontos@redhat.com)
