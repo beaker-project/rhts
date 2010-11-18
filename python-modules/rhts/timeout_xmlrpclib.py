@@ -1,5 +1,6 @@
 import xmlrpclib
 import httplib
+import sys
 
 def Server(url, *args, **kwargs):
    t = TimeoutTransport()
@@ -13,8 +14,13 @@ def Server(url, *args, **kwargs):
 class TimeoutTransport(xmlrpclib.Transport):
 
    def make_connection(self, host):
-       conn = TimeoutHTTP(host)
-       conn.set_timeout(self.timeout)
+       if sys.version_info[:2] < (2, 7):
+           conn = TimeoutHTTP(host)
+           conn.set_timeout(self.timeout)
+       else:
+           conn = xmlrpclib.Transport.make_connection(self, host)
+           if self.timeout:
+               conn.timeout = self.timeout
        return conn
 
 class TimeoutHTTPConnection(httplib.HTTPConnection):
