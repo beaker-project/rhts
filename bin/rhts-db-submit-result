@@ -200,122 +200,241 @@ def msg_rotate():
         print "Rotating the /var/log/messages file"
 
 
-# check log_file for AVC Messages:
-def avc_grep(log_file, avc_since, log_file_str=None):
-    if not log_file_str:
-        log_file_str = log_file
-    if not os.path.exists(log_file):
-        print "   Warning: no such file: %s" % log_file_str
-        return ("PASS", "")
-    result = "PASS"
-    avc_data = ""
-    #Find AVC's and ignore granted AVC's in log_file
-    str = "/bin/grep avc: %s | /bin/grep --invert-match granted" % (log_file,)
-    avc_data += str+"\n"
-    (ret_val, data) = commands.getstatusoutput(str)
-    data_l = data.split("\n")
-    if ret_val / 256 == 0 and len(data_l) > 0:
+class Result(object):
 
-        if avc_since:
-            expression = re.compile('audit\((?P<time>\d*)\.\d*:\d*\): avc:  denied')
+    STR = ["PASS", "WARN", "FAIL"]
 
-            while len(data_l) != 0:
-                #Get time
-                m = expression.match(data_l[0])
-                if m == None:
-                    result = "WARN"
-                    data_l += ["Warning: Unable to parse timestamp"]
-                    break
+    def __init__(self, result):
+        self.result = self._index(result)
 
-                #If greater than time stamp break
-                if avc_since <= float(m.group('time')):
-                    break
+    def _index(result):
+        if isinstance(result, (str, unicode)):
+            return Result.STR.index(result.upper()[:4])
+        elif isinstance(result, Result):
+            return result.result
+        else:
+            raise TypeError("result must be instance of string or Result.")
+    _index = staticmethod(_index)
+
+    def and_(self, result):
+        self.result = max(self.result, self._index(result))
+
+    def or_(self, result):
+        self.result = min(self.result, self._index(result))
+
+    def pass_(self):
+        self.and_("PASS")
+
+    def warn(self):
+        self.and_("WARN")
+
+    def fail(self):
+        self.and_("FAIL")
+
+    def __str__(self):
+        return self.STR[self.result]
+
+
+class AuResult(object):
+
+    def __init__(self, data, success=True, avc=False, message=None):
+        self.data = data
+        self._success = success
+        self._avc = avc
+
+    def __nonzero__(self):
+        return self._success
+
+    def error(self):
+        return not self._success
+
+    def avc(self):
+        return self._avc
+
+
+class AuContext(object):
+
+    def __init__(self):
+        self.result = Result("PASS")
+        self.avc_data = []
+
+    def print_message(self, message):
+        print "   ", message,
+        self.append_message(message)
+
+    def append_message(self, message):
+        self.avc_data.append(message)
+
+    def merge(self, context):
+        self.result.and_(context.result)
+        self.avc_data += context.avc_data
+
+    def get_message(self):
+        return ''.join(self.avc_data)
+
+    def get_result(self):
+        return str(self.result)
+
+    def _aucheck(self, ret_val, data, store_result=True):
+        """
+        Checks the status and output of ausearch.
+
+        Return False when ausearch failed.
+
+        """
+        if ret_val / 256 == 0:
+            if store_result:
+                self.result.fail()
+            self.print_message("Fail: AVC messages found.\n")
+            return AuResult(data, avc=True)
+        else:
+            warn = data.find("<no matches>") < 0
+            if warn:
+                msg = "Warning: ausearch command failed.\n"
+                if store_result:
+                    self.result.warn()
+            else:
+                msg = "Info: No AVC messages found.\n"
+            self.print_message(msg)
+            return AuResult(data, success=not warn, message=msg)
+
+    def aucheck(self, cmd, append=True, file_=None, store_result=True):
+        if file_:
+            cmd = cmd + " >%s 2>&1" % file_
+            self.append_message("Running %r\n" % cmd)
+            (ret_val, data) = commands.getstatusoutput(cmd)
+            data += read_file(file_)
+        else:
+            self.append_message("Running %r\n" % cmd)
+            (ret_val, data) = commands.getstatusoutput(cmd)
+        if append:
+            self.append_message(data)
+        return self._aucheck(ret_val, data, store_result=store_result)
+
+    def avc_grep(self, log_file, avc_since, log_file_str=None, append=True):
+        """
+        check log_file for AVC Messages
+        """
+        if not log_file_str:
+            log_file_str = log_file
+        if not os.path.exists(log_file):
+            msg = "Warning: no such file: %s\n" % log_file_str
+            self.print_message(msg)
+            return AuResult('', message=msg)
+        #Find AVC's and ignore granted AVC's in log_file
+        if os.getenv('RHTS_OPTION_STRONGER_AVC', 'yes'):
+            str = "/bin/grep 'avc: ' %s" % (log_file,)
+        else:
+            str = "/bin/grep 'avc: ' %s | /bin/grep --invert-match granted" % (log_file,)
+        self.append_message(str+"\n")
+        (ret_val, data) = commands.getstatusoutput(str)
+        data_l = data.split("\n")
+        if ret_val / 256 == 0 and len(data_l) > 0:
+
+            if avc_since:
+
+                expression = re.compile('audit\((?P<time>\d*)\.\d*:\d*\): avc: ')
+
+                i = 0
+                while i < len(data_l):
+                    #Get time
+                    m = expression.match(data_l[i])
+                    if m == None:
+                        self.result.warn()
+                        data_l += ["Warning: Unable to parse timestamp"]
+                        break
+
+                    #If greater than time stamp break
+                    if avc_since <= float(m.group('time')):
+                        break
+
+                    i += 1
 
                 #Else remove from list
-                data_l = data_l[1:]
+                data_l = data_l[i:]
 
-        if len(data_l) != 0:
-            avc_data += "Following messages were found in %s:\n" % log_file_str
-            result="FAIL"
-            avc_data += "\n".join(data_l) + "\n"
-        else:
-            avc_data += "No AVC messages found in %s\n" % log_file_str
-    else:
-        avc_data += "No AVC messages found in %s\n" % log_file_str
-    return (result, avc_data)
+            if len(data_l) != 0:
+                self.result.fail()
+                if append:
+                    self.append_message("Following messages were found in %s:\n" % log_file_str)
+                    data = "\n".join(data_l) + "\n"
+                    self.append_message(data)
+                else:
+                    self.append_message("AVC messages found in %s\n" % log_file_str)
+                return AuResult(data, avc=True)
+
+        msg = "No AVC messages found in %s\n" % log_file_str
+        self.append_message(msg)
+        return AuResult('', message=msg)
 
 
 # Check for AVC Messages
 def avc_check(error_file, dmesg_file):
-    result = "PASS"
-    avc_data = ""
+    context = AuContext()
 
     if error_file == "+no_file":
         avc_since = None
         log_file = mktemp_file()
-        msg = "Warning: AVC_ERROR environment variable not defined.  Using epoch as start time\n"
-        print "   ", msg
-        avc_data += msg
+        context.print_message("Warning: AVC_ERROR environment variable not defined.  Using epoch as start time\n")
     else:
         avc_since = os.path.getmtime(error_file)
         print "   Info: Searching AVC errors produced since %s (%s)" % (avc_since,
                 time.asctime(time.localtime(avc_since)))
         log_file = error_file
-   
+
     #If ausearch is installed check it
     (ret_val, data) = commands.getstatusoutput("/usr/bin/which ausearch")
-    if ret_val / 256 == 0:
-
-        #Get time
-        if error_file == "+no_file":
-            str = "/sbin/ausearch -sv no -m AVC -m USER_AVC -m SELINUX_ERR < /dev/null"
-        else:
-            # MM/DD/YYYY may not be correct if non en_* locale is used. Always use
-            # en_US for consistency:
-            ts = time.strftime("%m/%d/%Y %H:%M:%S", time.localtime(avc_since))
-            str = "/usr/bin/env LC_ALL=en_US.UTF-8 /sbin/ausearch -sv no -m AVC -m USER_AVC -m SELINUX_ERR -ts %s < /dev/null" % ts
-        avc_data += str+"\n"
-         
-        #Run ausearch
-        (ret_val, data) = commands.getstatusoutput(str)
-        avc_data += data + "\n"
-      
-        #Check ausearch's return value (0 if AVC's, 1 if no AVC's)
-        if ret_val / 256 == 0:
-            result = "FAIL"
-        else:
-            if data == "<no matches>":
-                msg = "No AVC messages found with %s\n" % (str)
-                print "   Info:", msg
-                avc_data += msg
-            else:
-                avc_data += "Warning: ausearch command failed. Output:\n%s\n" % (data,)
-                (result, tmpdata) = avc_grep("/var/log/audit/audit.log", avc_since, log_file_str="audit.log")
-                if result != "FAIL":
-                    result = "WARN"
-                avc_data += tmpdata
+    if ret_val / 256 != 0:
+        context.print_message("Warning: /sbin/ausearch is not installed. Performing builtin audit.log search...\n")
+        context.avc_grep("/var/log/audit/audit.log", avc_since, log_file_str="audit.log", append=True)
     else:
-        msg = "Warning: /sbin/ausearch is not installed. Performing builtin audit.log search...\n"
-        print "   ", msg
-        avc_data += msg
-        (result, tmpdata) = avc_grep("/var/log/audit/audit.log", avc_since, log_file_str="audit.log")
-        avc_data += tmpdata
+        temp_file = mktemp_file()
+        #Get time
+        if avc_since:
+            ts = "-ts "+time.strftime("%m/%d/%Y %H:%M:%S", time.localtime(avc_since))
+        else:
+            ts = ""
+        context.print_message("Searching logs...\n")
+        cr = context.aucheck("/sbin/ausearch -m AVC -m USER_AVC -m SELINUX_ERR %s < /dev/null" % (ts,), file_=temp_file, append=True, store_result=False)
+        if cr.error():
+            context.avc_grep("/var/log/audit/audit.log", avc_since, log_file_str="audit.log", append=True)
+        elif cr.avc():
+            cr = None
+            context.print_message("Checking for errors...\n")
+            if os.getenv('RHTS_OPTION_STRONGER_AVC', 'yes'):
+                context.print_message("Using stronger AVC checks.\n\tDefine empty RHTS_OPTION_STRONGER_AVC parameter if this causes any problems.\n")
+                err = context.aucheck("cat %s | /sbin/ausearch -m AVC -m SELINUX_ERR" % (temp_file,), append=False).error()
+                temp_file2 = mktemp_file()
+                cr = context.aucheck("cat %s | /sbin/ausearch -m USER_AVC", file_=temp_file2, append=False, store_result=False)
+                if cr.error():
+                    err = True
+                elif cr.avc():
+                    cmd = "grep -Fw 'msgtype=error' %s" % (temp_file2,)
+                    context.append_message('Running %r\n' % (cmd,))
+                    (ret_val, out) = commands.getstatusoutput(cmd)
+                    if ret_val / 256 == 0:
+                        context.result.fail()
+                    else:
+                        context.append_message("No AVC messages found in %s.\n" % (temp_file2,))
+            else:
+                err = context.aucheck("cat %s | /sbin/ausearch -sv no" % (temp_file,), append=False).error()
+            if err:
+                context.print_message("Warning: ausearch command failed. Output:\n%s\n" % (data,))
+                context.avc_grep(temp_file, avc_since, log_file_str="audit.log", append=False)
 
-    (tmpres, tmpdata) = avc_grep(dmesg_file, avc_since, log_file_str="dmesg")
-    if tmpres != "PASS":
-        if result != "FAIL":
-            result = tmpres
-        avc_data += tmpdata
+    context.avc_grep(dmesg_file, avc_since, log_file_str="dmesg", append=True)
 
     #Sleep for 1 sec so avc denied messages will have differentiable time stamps
     time.sleep(1)
 
     #Write to log_file (and record timestamp)
+    print "Writing to %s\n:" % (log_file)
     LF = open(log_file, 'w')
-    LF.write(avc_data)
+    LF.write(context.get_message())
     LF.close( )
 
-    return (result, log_file, dmesg_file)
+    return (context.get_result(), log_file, dmesg_file)
+
 
 # Check for error messages in dmesg
 def check_for_errors(dmesg_file):

@@ -222,6 +222,7 @@ class Parser:
 
         self.valid_options = [
             'Compatible',
+            'StrongerAVC',
             ]
         
     def handle_error(self, message):
