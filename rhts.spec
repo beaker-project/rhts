@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.24
+Version: 4.25
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -163,6 +163,9 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Wed Nov 24 2010 Marian Csontos <mcsontos@redhat.com> 4.25-1
+- Enhanced ausearch (mcsontos@redhat.com)
+
 * Thu Nov 18 2010 Bill Peck <bpeck@redhat.com> 4.24-1
 - make it work with python2.7 (bpeck@redhat.com)
 
