@@ -333,7 +333,7 @@ class AuContext(object):
 
             if avc_since:
 
-                expression = re.compile('audit\((?P<time>\d*)\.\d*:\d*\): avc: ')
+                expression = re.compile('.*?audit\((?P<time>\d*)\.\d*:\d*\): ')
 
                 i = 0
                 while i < len(data_l):
@@ -378,8 +378,8 @@ def avc_check(error_file, dmesg_file):
         context.print_message("Warning: AVC_ERROR environment variable not defined.  Using epoch as start time\n")
     else:
         avc_since = os.path.getmtime(error_file)
-        print "   Info: Searching AVC errors produced since %s (%s)" % (avc_since,
-                time.asctime(time.localtime(avc_since)))
+        context.print_message("Info: Searching AVC errors produced since %s (%s)\n" %
+                (avc_since, time.asctime(time.localtime(avc_since))))
         log_file = error_file
 
     #If ausearch is installed check it
@@ -390,12 +390,14 @@ def avc_check(error_file, dmesg_file):
     else:
         temp_file = mktemp_file()
         #Get time
+        cmd = "/sbin/ausearch -m AVC -m USER_AVC -m SELINUX_ERR"
         if avc_since:
-            ts = "-ts "+time.strftime("%m/%d/%Y %H:%M:%S", time.localtime(avc_since))
-        else:
-            ts = ""
+            # MM/DD/YYYY may not be correct if non en_* locale is used. Always
+            # use en_US for consistency:
+            cmd = "/usr/bin/env LC_ALL=en_US.UTF-8 %s -ts %s" % (cmd, time.strftime("%m/%d/%Y %H:%M:%S", time.localtime(avc_since)))
         context.print_message("Searching logs...\n")
-        cr = context.aucheck("/sbin/ausearch -m AVC -m USER_AVC -m SELINUX_ERR %s < /dev/null" % (ts,), file_=temp_file, append=True, store_result=False)
+        cr = context.aucheck(cmd + " < /dev/null",
+                file_=temp_file, append=True, store_result=False)
         if cr.error():
             context.avc_grep("/var/log/audit/audit.log", avc_since, log_file_str="audit.log", append=True)
         elif cr.avc():
