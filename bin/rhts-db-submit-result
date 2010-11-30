@@ -259,11 +259,17 @@ class AuContext(object):
         self.avc_data = []
 
     def print_message(self, message):
-        print "   ", message,
+        if message[-1] == '\n':
+            cr = ""
+        else:
+            cr = "\n"
+        print "   ", message, cr,
         self.append_message(message)
 
-    def append_message(self, message):
+    def append_message(self, message, add_cr=True):
         self.avc_data.append(message)
+        if add_cr and message[-1] != '\n':
+            self.avc_data.append('\n')
 
     def merge(self, context):
         self.result.and_(context.result)
@@ -332,7 +338,7 @@ class AuContext(object):
             str = "/bin/grep 'avc: ' %s" % (log_file,)
         else:
             str = "/bin/grep 'avc: ' %s | /bin/grep --invert-match granted" % (log_file,)
-        self.append_message(str+"\n")
+        self.append_message(str)
         (ret_val, data) = commands.getstatusoutput(str)
         data_l = data.split("\n")
         if ret_val / 256 == 0 and len(data_l) > 0:
@@ -363,7 +369,7 @@ class AuContext(object):
                 self.result.fail()
                 if append:
                     self.append_message("Following messages were found in %s:\n" % log_file_str)
-                    data = "\n".join(data_l) + "\n"
+                    data = "\n".join(data_l)
                     self.append_message(data)
                 else:
                     self.append_message("AVC messages found in %s\n" % log_file_str)
