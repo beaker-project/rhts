@@ -298,7 +298,7 @@ class AuContext(object):
             self.print_message(msg)
             return AuResult(data, success=not warn, message=msg)
 
-    def aucheck(self, cmd, append=True, file_=None, store_result=True):
+    def command(self, cmd, append=True, file_=None, print_exit=False):
         if file_:
             cmd = cmd + " >%s 2>&1" % file_
             self.append_message("Running %r\n" % cmd)
@@ -307,8 +307,14 @@ class AuContext(object):
         else:
             self.append_message("Running %r\n" % cmd)
             (ret_val, data) = commands.getstatusoutput(cmd)
+        if print_exit and ret_val / 256 != 0:
+            self.append_message("Warning: Command %r Failed. Exit code %s\n" % (cmd, ret_val / 256))
         if append:
             self.append_message(data)
+        return (ret_val, data)
+
+    def aucheck(self, cmd, append=True, file_=None, store_result=True):
+        (ret_val, data) = self.command(cmd, append=append, file_=file_)
         return self._aucheck(ret_val, data, store_result=store_result)
 
     def avc_grep(self, log_file, avc_since, log_file_str=None, append=True):
@@ -425,6 +431,9 @@ def avc_check(error_file, dmesg_file):
                 context.avc_grep(temp_file, avc_since, log_file_str="audit.log", append=False)
 
     context.avc_grep(dmesg_file, avc_since, log_file_str="dmesg", append=True)
+
+    context.command("/usr/sbin/sestatus", print_exit=True)
+    context.command("rpm -q selinux-policy", print_exit=True)
 
     #Sleep for 1 sec so avc denied messages will have differentiable time stamps
     time.sleep(1)
