@@ -1,7 +1,7 @@
 # "Public" scripts, installed to /usr/bin:
 PUBLIC_SHELL_SCRIPTS := rhts-run-package rhts-create-new-test rhts-backup rhts-restore \
          rhts-environment.sh rhts-reboot rhts-report-result rhts-run-simple-test \
-         rhts-system-info rhts-test-runner.sh
+         rhts-system-info rhts-test-runner.sh rhts-extend
 PUBLIC_PYTHON_SCRIPTS := rhts-lint rhts-wizard rhts-abort rhts-db-submit-result \
          rhts-recipe-sync-block rhts-recipe-sync-set rhts-sync-block rhts-sync-set \
          rhts-submit-log rhts-test-checkin rhts-test-update

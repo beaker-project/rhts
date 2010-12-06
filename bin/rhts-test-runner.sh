@@ -150,6 +150,8 @@ LABWATCHDOG=$(expr $KILLTIME + 1800)
 
 # Only update watchdog on first time into test.  If we have rebooted then skip
 if [ $REBOOTCOUNT -eq 0 ]; then
+    logger -s "$0 rhts-extend $LAB_CONTROLLER $TESTID $LABWATCHDOG"
+    rhts-extend $LAB_CONTROLLER $TESTID $LABWATCHDOG
     logger -s "$0 rhts-test-checkin $RESULT_SERVER $HOSTNAME $JOBID $TEST $LABWATCHDOG $TESTID"
     rhts-test-checkin $RESULT_SERVER $HOSTNAME $JOBID $TEST $LABWATCHDOG $TESTID || exit 1
     logger -s "$0 rhts-test-update $RESULT_SERVER $TESTID start $RPACKAGES $PACKAGENAME"

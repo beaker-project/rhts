@@ -1,0 +1,8 @@
+#!/usr/bin/python
+
+import xmlrpclib
+import sys
+
+server = xmlrpclib.ServerProxy("http://%s:8000" % sys.argv[1])
+
+print server.extend_watchdog(sys.argv[2], int(sys.argv[3])) 
