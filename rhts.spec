@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.26
+Version: 4.27
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -164,6 +164,11 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Mon Dec 06 2010 Bill Peck <bpeck@redhat.com> 4.27-1
+- Merge branch 'master' of ssh://git.fedorahosted.org/git/rhts
+  (bpeck@redhat.com)
+- extend watchdog's directly through lab controller. (bpeck@redhat.com)
+
 * Tue Nov 30 2010 Marian Csontos <mcsontos@redhat.com> 4.26-1
 - Added: Print selinux status into AVCs (mcsontos@redhat.com)
 - Fixed: ausearch always using en_US date format (mcsontos@redhat.com)
