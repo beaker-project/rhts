@@ -52,7 +52,10 @@ if hg root &> /dev/null; then
 	REPO_ROOT=`hg root`
 	REPO_URL=`sed -rn 's|^default *=||p' $REPO_ROOT/.hg/hgrc`
 	REPO_NAME=`basename $REPO_URL`
-	PACKAGE_NAME="$REPO_NAME$REPO_PATH"
+	if [ -n "$REPO_NAME" ]; then
+		# ignore local repos
+		PACKAGE_NAME="$REPO_NAME$REPO_PATH"
+	fi
 fi
 
 if git log -1 &> /dev/null; then
@@ -60,7 +63,10 @@ if git log -1 &> /dev/null; then
 	REPO_REMOTE=`git config --get branch.master.remote`
 	REPO_URL=`git config --get remote.$REPO_REMOTE.url`
 	REPO_NAME=`basename $REPO_URL | sed -e 's/\.git$//'`
-	PACKAGE_NAME="$REPO_NAME$REPO_PATH"
+	if [ -n "$REPO_NAME" ]; then
+		# ignore local repos
+		PACKAGE_NAME="$REPO_NAME$REPO_PATH"
+	fi
 fi
 
 if [ -z "$PACKAGE_NAME" ]; then
