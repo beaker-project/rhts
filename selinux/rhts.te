@@ -29,12 +29,12 @@ gen_require(`
 #
 
 allow initrc_t mnt_t:dir rw_dir_perms;
-type_transition initrc_t mnt_t:file tmp_t;
+#type_transition initrc_t mnt_t:file tmp_t;
 
 allow unconfined_t mnt_t:dir rw_dir_perms;
-type_transition unconfined_t mnt_t:file tmp_t;
+#type_transition unconfined_t mnt_t:file tmp_t;
 
-allow domain initrc_tmp_t:file rw_file_perms;
+#allow domain initrc_tmp_t:file rw_file_perms;
 allow domain tmp_t:dir search_dir_perms;
 allow domain tmp_t:file rw_file_perms;
 allow domain mnt_t:dir search_dir_perms;

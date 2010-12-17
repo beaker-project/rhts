@@ -15,7 +15,7 @@
 # Authors: Bill Peck, Arjan van de Ven, Paul Sutherland
 
 if [ -z "$OUTPUTFILE" ]; then
-        export OUTPUTFILE=`mktemp /tmp/tmp.XXXXXX`
+        export OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
 fi
 
 if [ -z "$TESTPATH" ]; then
@@ -40,7 +40,7 @@ fi
 
 #Set to "+no_avc_check" in order to not report AVC messages to rhts
 if [ -z "$AVC_ERROR" ]; then
-    export AVC_ERROR=`mktemp /tmp/tmp.XXXXXX`
+    export AVC_ERROR=`mktemp /mnt/testarea/tmp.XXXXXX`
     touch $AVC_ERROR
 fi
 
@@ -53,10 +53,10 @@ fi
 
 # Set a "well known" log name, so if the localwatchdog triggers
 #  we can still file OUTPUTFILE and get some results.
-if [ -h /tmp/current.log ]; then
-        ln -sf $OUTPUTFILE /tmp/current.log
+if [ -h /mnt/testarea/current.log ]; then
+        ln -sf $OUTPUTFILE /mnt/testarea/current.log
 else
-        ln -s $OUTPUTFILE /tmp/current.log
+        ln -s $OUTPUTFILE /mnt/testarea/current.log
 fi
 
 # this file is for sourcing in rhts test scripts
@@ -90,7 +90,7 @@ function startup_test {
 	wasrunning=`pidof Xvfb`
 
 	if [ "0$wasrunning" -eq "0" ]; then
-        	Xvfb :1 -screen 0 1600x1200x24 -fbdir /tmp &
+        	Xvfb :1 -screen 0 1600x1200x24 -fbdir /mnt/testarea &
 		sleep 3
         	export DISPLAY=:1
 	fi

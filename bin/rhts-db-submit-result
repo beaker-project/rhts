@@ -66,14 +66,14 @@ if not hasattr(tempfile, "mkstemp"):
 # old way
 #def mktemp_file():
 #    global temp_files
-#    (ret_val, log_file) = commands.getstatusoutput("/bin/mktemp /tmp/tmp.XXXXXX")
+#    (ret_val, log_file) = commands.getstatusoutput("/bin/mktemp /mnt/testarea/tmp.XXXXXX")
 #    temp_files.append(log_file)
 #    return log_file
 
 # new & secure
 def mktemp_file():
     global temp_files
-    (fh, f) = tempfile.mkstemp(prefix='tmp.rhts-db-submit-result.', dir='/tmp')
+    (fh, f) = tempfile.mkstemp(prefix='tmp.rhts-db-submit-result.', dir='/mnt/testarea')
     os.close(fh)
     temp_files.append(f)
     return f

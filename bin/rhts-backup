@@ -23,7 +23,7 @@ if [ -n "$RHTS_BACKUP_DIR" ]; then
     DEST=$(echo $RHTS_BACKUP_DIR | sed 's|/$||')
     echo "Backup directory set. Backing up files to ${DEST}."
 elif [ -z "$RECIPETESTID" ]; then
-    DEST=$(mktemp -d /tmp/rhts-backup-XXXXXXXX)
+    DEST=$(mktemp -d /mnt/testarea/rhts-backup-XXXXXXXX)
     echo "Developer mode detected. Backing up files to ${DEST}"
 else  
     DEST="/var/cache/rhts/${RECIPETESTID}/backup"

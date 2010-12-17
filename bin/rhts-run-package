@@ -27,7 +27,7 @@ if [ -z $1 ]; then
 fi
 
 RPM=$1
-EXTRACTION_PATH=`mktemp -d /tmp/rhts-run-package-XXXXXXXX`
+EXTRACTION_PATH=`mktemp -d /mnt/testarea/rhts-run-package-XXXXXXXX`
 OPATH=$(pwd)
 pushd $EXTRACTION_PATH
 rpm2cpio $OPATH/$RPM | cpio -i --make-directories > /dev/null || exit 1

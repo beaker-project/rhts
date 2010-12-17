@@ -114,7 +114,7 @@ def main():
     server = xmlrpclib.Server("http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % result_server)
     # Upload TESTOUT.log
     if recipetestid:
-        rhts.uploadWrapper(server, '/tmp/TESTOUT.log', recipetestid)
+        rhts.uploadWrapper(server, '/mnt/testarea/TESTOUT.log', recipetestid)
     if type == 'recipe' and recipeid:
         result = abortRecipe(server,recipeid)
     elif type == 'recipeset' and recipesetid:

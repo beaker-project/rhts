@@ -62,7 +62,7 @@ echo "               RELEASE: $RELEASE"
 echo "            SOURCE_DIR: $SOURCE_DIR"
 
 # TMP_DIR: do everything for this run under a unique temp directory
-TMP_DIR=`mktemp -d /tmp/rhts-build-XXXXXXXX` || exit 1
+TMP_DIR=`mktemp -d /mnt/testarea/rhts-build-XXXXXXXX` || exit 1
 echo "               TMP_DIR: $TMP_DIR"
 
 # BUILD_DIR: the build directory for rpmbuild operations (to avoid needing root permission)

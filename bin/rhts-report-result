@@ -33,7 +33,7 @@ if [ -n "$4" ]; then
 fi
 
 # echo Reporting test $1 as $2 > /dev/stderr
-dmesg -c > /tmp/dmesg.log
+dmesg -c > /mnt/testarea/dmesg.log
 
 if [ "$RESULT_SERVER+is_not_set" = "+is_not_set" ]; then 
 		SERVER_OPTIONS=""
@@ -54,6 +54,6 @@ rhts-db-submit-result \
 	$resultvalue \
 	$SERVER_OPTIONS \
 	--testversion=$TESTVERSION \
-	--dmesg=/tmp/dmesg.log \
+	--dmesg=/mnt/testarea/dmesg.log \
 	$RECIPETESTID_OPTIONS 
 

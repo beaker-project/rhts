@@ -31,21 +31,21 @@ function diffat() {
 function submit_testout() {
     local start=0
     declare -i start=0
-    if [[ ! -f /tmp/TESTOUT.log ]]; then
+    if [[ ! -f /mnt/testarea/TESTOUT.log ]]; then
         return 0
     fi
-    mkdir /tmp/rhts &>/dev/null
+    mkdir /mnt/testarea/rhts &>/dev/null
     # the file is still growing: make a copy first
-    cp /tmp/TESTOUT.log /tmp/rhts/TESTOUT.log
-    if [[ -f /tmp/_TESTOUT.log ]]; then
-      if cmp -s /tmp/rhts/TESTOUT.log /tmp/_TESTOUT.log; then
+    cp /mnt/testarea/TESTOUT.log /mnt/testarea/rhts/TESTOUT.log
+    if [[ -f /mnt/testarea/_TESTOUT.log ]]; then
+      if cmp -s /mnt/testarea/rhts/TESTOUT.log /mnt/testarea/_TESTOUT.log; then
           # files do not differ - nothing to upload
           return 0
       fi
-      start=$(diffat /tmp/rhts/TESTOUT.log /tmp/_TESTOUT.log)
+      start=$(diffat /mnt/testarea/rhts/TESTOUT.log /mnt/testarea/_TESTOUT.log)
     fi
-    rhts-submit-log -l /tmp/rhts/TESTOUT.log --start="$start"
-    mv -f /tmp/rhts/TESTOUT.log /tmp/_TESTOUT.log
+    rhts-submit-log -l /mnt/testarea/rhts/TESTOUT.log --start="$start"
+    mv -f /mnt/testarea/rhts/TESTOUT.log /mnt/testarea/_TESTOUT.log
 }
 
 function report_finish {
@@ -53,8 +53,8 @@ function report_finish {
     # upload the STDOUT/STDERR of the just run test
     submit_testout
     # Clear the log
-    > /tmp/TESTOUT.log
-    rm -f /tmp/_TESTOUT.log
+    > /mnt/testarea/TESTOUT.log
+    rm -f /mnt/testarea/_TESTOUT.log
     [ -n "$OUTPUTFILE" ] && cat $OUTPUTFILE
     export TESTORDER=$(expr $TESTORDER + 1)
     rhts-sync-set -s DONE
@@ -128,7 +128,7 @@ else
 fi
 
 . /usr/bin/rhts_environment.sh
-OUTPUTFILE=`mktemp /tmp/tmp.XXXXXX`
+OUTPUTFILE=`mktemp /mnt/testarea/tmp.XXXXXX`
 # Don't export our OUTPUTFILE to the test were running.
 export -n OUTPUTFILE
 
@@ -166,7 +166,7 @@ if [ "$?" -ne "0" ]; then
 else
     if [ -e "Makefile" ]; then
 	set -m
-	make run >>/tmp/TESTOUT.log 2>&1 &
+	make run >>/mnt/testarea/TESTOUT.log 2>&1 &
         pid=$!
         while ps -p "$pid" | grep -q "$pid";do
             uptime=$(cat /proc/uptime| awk -F. {'print $1'})
@@ -179,7 +179,7 @@ else
             if [ $(expr $uptime % ${UPLOAD_SECONDS:-300}) = 0 ]; then
                 # upload the STDOUT/STDERR of the currently running test
                 timestamp=$(/bin/date '+%F %T')
-		echo -e "\nMARK-LWD-LOOP -- $timestamp --" >> /tmp/TESTOUT.log
+		echo -e "\nMARK-LWD-LOOP -- $timestamp --" >> /mnt/testarea/TESTOUT.log
                 submit_testout
             fi
             # Sleep for a specified time then wake up to kill the child process.
@@ -188,13 +188,13 @@ else
 		#  Before we kill the processes.
 		rhts-system-info
                 timestamp=$(/bin/date '+%F %T')
-		echo "kill $pid -- $timestamp --" >> /tmp/TESTOUT.log
+		echo "kill $pid -- $timestamp --" >> /mnt/testarea/TESTOUT.log
 		kill -15 -"$pid"
 		rc=$?
 		if [ $rc -gt 0 ]; then
-		    echo "Failed to kill $pid" >> /tmp/TESTOUT.log
+		    echo "Failed to kill $pid" >> /mnt/testarea/TESTOUT.log
 		else
-		    echo "Succesfully killed $pid" >> /tmp/TESTOUT.log
+		    echo "Succesfully killed $pid" >> /mnt/testarea/TESTOUT.log
                 fi
                 echo "$UPTIMEKILL $KILLTIME"-second timeout expires, kill pgrp "$pid" >>$OUTPUTFILE
                 logger -s "$0 $UPTIMEKILL $KILLTIME-second timeout expires, kill pgrp $pid"
@@ -207,8 +207,8 @@ else
 		    done
 		fi
                 # Upload $OUTPUTFILE from the test that was aborted.
-		if [ -h /tmp/current.log ]; then
-		    rhts-submit-log -l /tmp/current.log
+		if [ -h /mnt/testarea/current.log ]; then
+		    rhts-submit-log -l /mnt/testarea/current.log
 		fi
                 report_finish
 		# If local watchdog triggers we reboot to attempt to get things
