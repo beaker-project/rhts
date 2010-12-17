@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.27
+Version: 4.28
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -164,6 +164,11 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Fri Dec 17 2010 Bill Peck <bpeck@redhat.com> 4.28-1
+- use /mnt/testarea instead of /tmp.  /tmp should not be used as it will
+  trigger avc errors. (bpeck@redhat.com)
+- make package not working with local git repos (mcsontos@redhat.com)
+
 * Mon Dec 06 2010 Bill Peck <bpeck@redhat.com> 4.27-1
 - Merge branch 'master' of ssh://git.fedorahosted.org/git/rhts
   (bpeck@redhat.com)
