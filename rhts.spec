@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.28
+Version: 4.29
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -164,6 +164,10 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Fri Jan 14 2011 Bill Peck <bpeck@redhat.com> 4.29-1
+- revert tighter selinux controls (bpeck@redhat.com)
+- Added: CompatService to RhtsOptions (mcsontos@redhat.com)
+
 * Fri Dec 17 2010 Bill Peck <bpeck@redhat.com> 4.28-1
 - use /mnt/testarea instead of /tmp.  /tmp should not be used as it will
   trigger avc errors. (bpeck@redhat.com)
