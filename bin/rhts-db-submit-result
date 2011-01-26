@@ -338,6 +338,8 @@ class AuContext(object):
             str = "/bin/grep 'avc: ' %s" % (log_file,)
         else:
             str = "/bin/grep 'avc: ' %s | /bin/grep --invert-match granted" % (log_file,)
+        # Don't report on TESTOUT.log errors
+        str = "%s | /bin/grep --invert-match TESTOUT.log" % (str)
         self.append_message(str)
         (ret_val, data) = commands.getstatusoutput(str)
         data_l = data.split("\n")
