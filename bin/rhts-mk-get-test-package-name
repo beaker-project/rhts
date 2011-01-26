@@ -39,8 +39,8 @@ fi
 
 if [ -d "$SOURCE_DIR/.svn" ]; then
 	REPO_ROOT=`svn info $SOURCE_DIR | fgrep "Repository Root:" | awk '{print $3}'`
-	REPO_NAME=`echo $REPO_ROOT | sed -e "s/http[s]\?:\/\///" | sed -e "s/[\.\/]/-/g"`
-	PACKAGE_NAME=`svn info $SOURCE_DIR  |  fgrep "URL:" | awk '{print $2}' | sed -e "s/http[s]\?:\/\///" | sed -e "s/[\.\/]/-/g"`
+	REPO_NAME=`echo $REPO_ROOT | sed -e "s'svn+ssh://[^@]*@''" | sed -e "s/http[s]\?:\/\///" | sed -e "s/[\.\/]/-/g"`
+	PACKAGE_NAME=`svn info $SOURCE_DIR  |  fgrep "URL:" | awk '{print $2}' | sed -e "s'svn+ssh://[^@]*@''" | sed -e "s/http[s]\?:\/\///" | sed -e "s/[\.\/]/-/g"`
         # Shorten package names for the 108 repo:
 	PACKAGE_NAME=`echo $PACKAGE_NAME | sed -e "s/testing-108-redhat-com-svn-testing-trunk-rhts-tests-promoted/tc/"`
 	PACKAGE_NAME=`echo $PACKAGE_NAME | sed -e "s/testing-108-redhat-com-svn-testing-trunk-rhts-tests-sandbox/tc-sandbox/"`
