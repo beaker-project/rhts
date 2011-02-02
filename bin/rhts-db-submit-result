@@ -441,7 +441,7 @@ def avc_check(error_file, dmesg_file):
     context.avc_grep(dmesg_file, avc_since, log_file_str="dmesg", append=True)
 
     context.command("/usr/sbin/sestatus", print_exit=True)
-    context.command("rpm -q selinux-policy", print_exit=True)
+    context.command("rpm -q selinux-policy || true", print_exit=True)
 
     #Sleep for 1 sec so avc denied messages will have differentiable time stamps
     time.sleep(1)
