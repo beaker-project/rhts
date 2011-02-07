@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.29
+Version: 4.30
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -164,6 +164,11 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Mon Feb 07 2011 Bill Peck <bpeck@redhat.com> 4.30-1
+- ignore rpm -q error. (bpeck@redhat.com)
+- Avoid reporting selinux errors on the harness itself. (bpeck@redhat.com)
+- bz664764 - rhts-devel and svn+ssh problem (mcsontos@redhat.com)
+
 * Fri Jan 14 2011 Bill Peck <bpeck@redhat.com> 4.29-1
 - revert tighter selinux controls (bpeck@redhat.com)
 - Added: CompatService to RhtsOptions (mcsontos@redhat.com)
