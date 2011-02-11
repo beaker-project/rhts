@@ -40,7 +40,7 @@ export -n OUTPUTFILE
 function handle_failure {
 	ARG_ERROR_MESSAGE=$1
 
-	echo $ARG_ERROR_MESSAGE | tee -a $OUTPUTFILE
+	echo $ARG_ERROR_MESSAGE | tee $OUTPUTFILE
 
 	report_result $ARG_TEST_NAME "FAIL"
 	exit 1	
@@ -88,7 +88,7 @@ fi
 	EXIT_CODE=$?
 	echo "$EXIT_CODE" > $TMPFILE
 	echo "...finished running $ARG_EXECUTABLE_NAME, exit code=$EXIT_CODE"
-} 2>&1 | tee -a $OUTPUTFILE
+} 2>&1 | tee $OUTPUTFILE
 
 #echo "recovered exit code=`cat $TMPFILE`"
 
