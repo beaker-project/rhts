@@ -955,6 +955,11 @@ class RequiresFieldTests(unittest.TestCase):
         Requires: foo bar""", raise_errors=False)
         self.assertEquals(ti.requires, ['evolution', 'dogtail', 'foo', 'bar'])
 
+    def test_requires_with_case_differences(self):
+        "Ensure Requires field is parsed correctly"
+        ti = parse_string("Requires: opencryptoki openCryptoki", raise_errors=False)
+        self.assertEquals(ti.requires, ['opencryptoki', 'openCryptoki'])
+
 class RunForFieldTests(unittest.TestCase):
     def test_single_line_runfor(self):
         "Ensure RunFor field is parsed correctly"
