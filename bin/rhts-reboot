@@ -12,9 +12,7 @@ else
 	fi
 fi
 
-# ia64 need nextboot set
-MYARCH=$(uname -m)
-if [ "x$MYARCH" = "xia64" -a -e "/usr/sbin/efibootmgr" ]; then
+if [ -e "/usr/sbin/efibootmgr" ]; then
     EFI=$(efibootmgr -v | grep BootCurrent | awk '{ print $2}')
     if [ -n "$EFI" ]; then
         logger -s "efibootmgr -n $(efibootmgr -v | grep BootCurrent | awk '{ print $2}')"
