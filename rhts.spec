@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.30
+Version: 4.31
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -164,6 +164,13 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Fri Mar 11 2011 Bill Peck <bpeck@redhat.com> 4.31-1
+- Support uefibootmgr on all arches that have it installed. (bpeck@redhat.com)
+- sanity checks for git tags (dcallagh@redhat.com)
+- rhts-run-simple-test doesn't need to use tee -a, produces redundant output.
+  (bpeck@redhat.com)
+- rhts-mk-get-current-tag ignores packed-refs (dcallagh@redhat.com)
+
 * Mon Feb 07 2011 Bill Peck <bpeck@redhat.com> 4.30-1
 - ignore rpm -q error. (bpeck@redhat.com)
 - Avoid reporting selinux errors on the harness itself. (bpeck@redhat.com)
