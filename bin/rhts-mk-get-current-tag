@@ -29,7 +29,7 @@ PACKAGE_NAME=`rhts-mk-get-test-package-name`
 
 # for CVS, find the tag with the package name
 if [ -d "CVS" ]; then
-	CURRENT_TAG=`cvs -Q status -lv | grep -v '^?' | grep -E "${PACKAGE_NAME}-([0-9_\-]+)" | head -n 1  | awk '{print $1}'`
+        CURRENT_TAG=`cvs -Q status -lv | grep -v '^?' | grep -F "${PACKAGE_NAME}" | head -n 1  | awk '{print $1}'`
 fi
 
 # for svn, just use the svn repo revision number for the package revision number
