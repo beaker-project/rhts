@@ -68,6 +68,23 @@ function report_finish {
     logger -s "$0 report_finish stop..."
 }
 
+function get_hooks() {
+    if [[ -z $1 ]]; then
+        echo "ERROR: HOOK is not defined." >&2
+        echo "Usage: hooks HOOK" >&2
+        return 1
+    fi
+    for path in $HOME/.rhts/hooks ${RHTSDIR:-"/usr/share/rhts"}/hooks; do
+        if [[ -d $path ]]; then
+            for f in $path/$1/*; do
+                if [[ -x $f ]]; then
+                    echo $(basename $f) $f
+                fi
+            done
+        fi
+    done | sort | awk '{ print $2 }'
+}
+
 if [ -z "$TEST" ]; then
     echo "TEST is not defined"
     exit 1
@@ -185,6 +202,11 @@ else
             # Sleep for a specified time then wake up to kill the child process.
             if [ "$uptime" -ge "$UPTIMEKILL" ]; then
 		# Try and get some system data why the system LWD.
+                # run watchdog hooks:
+                for f in $(get_hooks watchdog); do
+                    echo "Watchdog: running '$f'..." >> /mnt/testarea/TESTOUT.log
+                    TASK_PID=$pid "$f" watchdog >> /mnt/testarea/TESTOUT.log 2>&1
+                done
 		#  Before we kill the processes.
 		rhts-system-info
                 timestamp=$(/bin/date '+%F %T')
