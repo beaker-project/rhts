@@ -209,6 +209,10 @@ else
                 done
 		#  Before we kill the processes.
 		rhts-system-info
+                if ! ps -p "$pid" | grep -q "$pid"; then
+                    echo "It took a bit longer but the task '$pid' has finished at last..."
+                    break
+                fi
                 timestamp=$(/bin/date '+%F %T')
 		echo "kill $pid -- $timestamp --" >> /mnt/testarea/TESTOUT.log
 		kill -15 -"$pid"
