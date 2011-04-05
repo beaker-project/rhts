@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.31
+Version: 4.32
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -165,6 +165,11 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Tue Apr 05 2011 Marian Csontos <mcsontos@redhat.com> 4.32-1
+- bz644805 - Added hook to run scripts on watchdog (mcsontos@redhat.com)
+- bz688218 - make rpm does not handle regexp metachars in test names
+  (bpeck@redhat.com)
+
 * Fri Mar 11 2011 Bill Peck <bpeck@redhat.com> 4.31-1
 - Support uefibootmgr on all arches that have it installed. (bpeck@redhat.com)
 - sanity checks for git tags (dcallagh@redhat.com)
