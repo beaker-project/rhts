@@ -26,7 +26,7 @@ VERSION="1.0"
 RELEASE="0"
 
 if [ -n "$TAG" ]; then
-   VERSION=`echo $TAG |  sed -e "s/.*-\([0-9_]*\)-\([0-9]*\)$/\1/" | sed -e 's/_/\./g'`
+   VERSION=`echo $TAG |  sed -e "s/.*-\([0-9_\.]*\)-\([0-9]*\)$/\1/" | sed -e 's/_/\./g'`
    RELEASE=`echo $TAG |  sed -e "s/.*-\([0-9]*\)$/\1/"`
 fi
 
