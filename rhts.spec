@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.32
+Version: 4.33
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -165,6 +165,13 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Mon May 02 2011 Bill Peck <bpeck@redhat.com> 4.33-1
+- Fix git tagging to work on new repos with no current_tag. (bpeck@redhat.com)
+- fix to use annoted tags so that taggerdate can be used for sorting.
+  (bpeck@redhat.com)
+- fix from tosky@redhat.com to fix tagging to support periods in those version
+  control systems that support it. (bpeck@redhat.com)
+
 * Tue Apr 05 2011 Marian Csontos <mcsontos@redhat.com> 4.32-1
 - bz644805 - Added hook to run scripts on watchdog (mcsontos@redhat.com)
 - bz688218 - make rpm does not handle regexp metachars in test names
