@@ -34,11 +34,14 @@ if git log -1 &>/dev/null; then
 	NEXT_TAG=`rhts-mk-get-next-tag`
 
 	if [ -n "$NEXT_TAG" ]; then
-                # Sanity check: is the current tag merged into this branch?
-                if ! git rev-list HEAD | grep -q $(git show-ref --hash --tags "$CURRENT_TAG") ; then
-                    echo "Error: current tag $CURRENT_TAG is not an ancestor of HEAD"
-                    echo "(Hint: make sure it is merged into this branch)"
-                    exit 1
+		if [ -n "$CURRENT_TAG" ]; then
+                	# Sanity check: is the current tag merged into this branch?
+			# Only do this if $CURRENT_TAG is defined.
+                	if ! git rev-list HEAD | grep -q $(git show-ref --hash --tags "$CURRENT_TAG") ; then
+                    		echo "Error: current tag $CURRENT_TAG is not an ancestor of HEAD"
+                    		echo "(Hint: make sure it is merged into this branch)"
+                    		exit 1
+                	fi
                 fi
 		echo Tagging release as $NEXT_TAG
 		git tag -m "$NEXT_TAG" $NEXT_TAG
