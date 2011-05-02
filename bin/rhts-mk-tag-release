@@ -41,7 +41,7 @@ if git log -1 &>/dev/null; then
                     exit 1
                 fi
 		echo Tagging release as $NEXT_TAG
-		git tag $NEXT_TAG
+		git tag -m "$NEXT_TAG" $NEXT_TAG
 	else
 		echo Error: could not determine the next tag
 	fi
