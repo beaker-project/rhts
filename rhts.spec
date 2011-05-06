@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.33
+Version: 4.34
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -165,6 +165,9 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Fri May 06 2011 Bill Peck <bpeck@redhat.com> 4.34-1
+- remove * from tagcommiter. (bpeck@redhat.com)
+
 * Mon May 02 2011 Bill Peck <bpeck@redhat.com> 4.33-1
 - Fix git tagging to work on new repos with no current_tag. (bpeck@redhat.com)
 - fix to use annoted tags so that taggerdate can be used for sorting.
