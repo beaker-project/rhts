@@ -41,7 +41,7 @@ fi
 
 # for git, do the same thing we do for cvs
 if git log -1 &>/dev/null; then
-        CURRENT_TAG=$(git for-each-ref --count=1 --sort=-*taggerdate --format="%(refname)" "refs/tags/${PACKAGE_NAME}*" | cut -c 11-)
+        CURRENT_TAG=$(git for-each-ref --count=1 --sort=-taggerdate --format="%(refname)" "refs/tags/${PACKAGE_NAME}*" | cut -c 11-)
 fi
 
 if [ $# == 1 ]; then
