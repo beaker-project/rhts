@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.34
+Version: 4.35
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -165,6 +165,10 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Tue May 10 2011 Bill Peck <bpeck@redhat.com> 4.35-1
+- fix checking of remote tags to be consistent with make package.
+  (bpeck@redhat.com)
+
 * Fri May 06 2011 Bill Peck <bpeck@redhat.com> 4.34-1
 - remove * from tagcommiter. (bpeck@redhat.com)
 
