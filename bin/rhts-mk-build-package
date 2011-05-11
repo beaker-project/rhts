@@ -90,9 +90,15 @@ TESTCOVERAGE=$GENERATED_SOURCE_DIR/testcoverage
 if git log -1 &>/dev/null ; then
     if git config remote.origin.url >/dev/null ; then
         echo "Verifying that tag is present in remote: $CURRENT_TAG"
-        if ! git ls-remote origin --tags "$CURRENT_TAG" | grep -qF "$CURRENT_TAG" ; then
-            echo "Error: current tag $CURRENT_TAG is not in remote 'origin'"
-            echo "(Hint: git push --tags)"
+        CURRENT_HASH=$(git show-ref --hash --tags $CURRENT_TAG)
+        REMOTE_HASH=$(git ls-remote origin --tags $CURRENT_TAG| awk {'print $1'})
+        if [ "$CURRENT_HASH" != "$REMOTE_HASH" ]; then
+            if [ -z "$REMOTE_HASH" ]; then
+                echo "Error: current tag $CURRENT_TAG is not in remote 'origin'"
+                echo "(Hint: git push --tags)"
+            else
+                echo "Error: local hash $CURRENT_HASH of tag $CURRENT_TAG is different from remote $REMOTE_HASH"
+            fi
             exit 1
         fi
     fi
