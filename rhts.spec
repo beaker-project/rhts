@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.35
+Version: 4.36
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -165,6 +165,13 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Wed May 11 2011 Bill Peck <bpeck@redhat.com> 4.36-1
+- need to dereference tags now that they are heavyweight (dcallagh@redhat.com)
+- fallback logic when no annotated tags are found (dcallagh@redhat.com)
+- Verify the tags hash matches upstream (bpeck@redhat.com)
+- Revert "fix checking of remote tags to be consistent with make package."
+  (bpeck@redhat.com)
+
 * Tue May 10 2011 Bill Peck <bpeck@redhat.com> 4.35-1
 - fix checking of remote tags to be consistent with make package.
   (bpeck@redhat.com)
