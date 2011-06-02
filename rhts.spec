@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.36
+Version: 4.37
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -165,6 +165,9 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Thu Jun 02 2011 Bill Peck <bpeck@redhat.com> 4.37-1
+- Renamed rhts-wizard to beaker-wizard (bpeck@redhat.com)
+
 * Wed May 11 2011 Bill Peck <bpeck@redhat.com> 4.36-1
 - need to dereference tags now that they are heavyweight (dcallagh@redhat.com)
 - fallback logic when no annotated tags are found (dcallagh@redhat.com)
