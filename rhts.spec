@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.37
+Version: 4.38
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -165,6 +165,9 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Thu Jun 02 2011 Bill Peck <bpeck@redhat.com> 4.38-1
+- fix Makefile to install beaker-wizard (bpeck@redhat.com)
+
 * Thu Jun 02 2011 Bill Peck <bpeck@redhat.com> 4.37-1
 - Renamed rhts-wizard to beaker-wizard (bpeck@redhat.com)
 
