@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.38
+Version: 4.39
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -169,6 +169,20 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Tue Aug 23 2011 Bill Peck <bpeck@redhat.com> 4.39-1
+- make rpm doesn't take version into account when run on directory outside
+  version control (bpeck@redhat.com)
+- add missing Requires for rhts-devel (dcallagh@redhat.com)
+- Owner field should be mandatory (dcallagh@redhat.com)
+- beaker-wizard: Use  instead of  in the templates (psplicha@redhat.com)
+- better regexp for validating Owner: field (dcallagh@redhat.com)
+- beaker-wizard: Description may not contain colons [BZ#722413]
+  (psplicha@redhat.com)
+- beaker-wizard: updated links (psplicha@redhat.com)
+- beaker-wizard: chmod scripts only when necessary [BZ#709753]
+  (psplicha@redhat.com)
+- Write pending changes to disk (mcsontos@redhat.com)
+
 * Thu Jun 02 2011 Bill Peck <bpeck@redhat.com> 4.38-1
 - fix Makefile to install beaker-wizard (bpeck@redhat.com)
 
