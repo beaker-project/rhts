@@ -182,8 +182,11 @@ if [ "$?" -ne "0" ]; then
     report_result $TEST/CHANGEDIR Warn
 else
     if [ -e "Makefile" ]; then
-	set -m
-	make run >>/mnt/testarea/TESTOUT.log 2>&1 &
+        # Write pending changes to disk for case of crash early in the test.
+        # This can confuse REBOOTCOUNT and result in infinite loop.
+        sync
+        set -m
+        make run >>/mnt/testarea/TESTOUT.log 2>&1 &
         pid=$!
         while ps -p "$pid" | grep -q "$pid";do
             uptime=$(cat /proc/uptime| awk -F. {'print $1'})
