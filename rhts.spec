@@ -75,8 +75,20 @@ popd
 %if 0%{?rhel}%{?fedora} > 4
 # Build RHTS Selinux Testing Policy 
 pushd selinux
-make -f %{_datadir}/selinux/devel/Makefile
-install -p -m 644 -D rhts.pp $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}/rhts.pp
+# If dist specific selinux module is present use that.
+# Why:
+#  newer releases may introduce new selinux macros which are not present in
+#  older releases.  This means that a module built under the newer release
+#  will no longer load on an older release.  
+# How:
+#  Simply issue the else statement on the older release and commit the 
+#  policy to git with the appropriate dist tag.
+if [ -e "rhts%{?dist}.pp" ]; then
+    install -p -m 644 -D rhts%{?dist}.pp $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}/rhts.pp
+else
+    make -f %{_datadir}/selinux/devel/Makefile
+    install -p -m 644 -D rhts.pp $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}/rhts.pp
+fi
 popd
 %endif
 
