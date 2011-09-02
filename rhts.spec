@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.39
+Version: 4.40
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -181,6 +181,9 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Fri Sep 02 2011 Bill Peck <bpeck@redhat.com> 4.40-1
+- rhts selinux module fails to load on RHEL6.0 (bpeck@redhat.com)
+
 * Tue Aug 23 2011 Bill Peck <bpeck@redhat.com> 4.39-1
 - make rpm doesn't take version into account when run on directory outside
   version control (bpeck@redhat.com)
