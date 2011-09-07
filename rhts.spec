@@ -26,6 +26,7 @@ Group: Development/Libraries
 Obsoletes: rhts-rh-devel
 Provides: rhts-rh-devel
 Requires: rhts-test-env = %{version}
+Requires: beaker >= 0.7.2
 Requires: beaker-client
 Requires: tar
 Requires: sed
