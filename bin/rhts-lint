@@ -15,7 +15,7 @@
 # Author: David Malcolm
 import fileinput
 import unittest
-from bkr.common import testinfo
+import rhts.testinfo
 
 class __DeferredFileInputFilenameString:
     """
@@ -34,7 +34,7 @@ class __DeferredFileInputFilenameString:
         
 if __name__=='__main__':
     input = fileinput.input()
-    p = testinfo.StdoutParser(__DeferredFileInputFilenameString())
+    p = rhts.testinfo.StdoutParser(__DeferredFileInputFilenameString())
     p.parse(input)
     
     
