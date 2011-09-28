@@ -163,7 +163,6 @@ fi
 
 %files devel
 %defattr(-,root,root)
-%attr(0755, root, root)%{_bindir}/rhts-create-new-test
 %attr(0755, root, root)%{_bindir}/beaker-wizard
 %attr(0755, root, root)%{_bindir}/rhts-lint
 %attr(0755, root, root)%{_bindir}/rhts-run-package
