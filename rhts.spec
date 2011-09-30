@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.40
+Version: 4.41
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -180,6 +180,9 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Fri Sep 30 2011 Bill Peck <bpeck@redhat.com> 4.41-1
+- rhts-create-new-test is not needed anymore (bpeck@redhat.com)
+
 * Fri Sep 02 2011 Bill Peck <bpeck@redhat.com> 4.40-1
 - rhts selinux module fails to load on RHEL6.0 (bpeck@redhat.com)
 
