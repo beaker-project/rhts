@@ -37,10 +37,10 @@ class TestInfo:
     def __init__(self):
         self.test_name = None
         self.test_description = None
-        self.test_archs = None
+        self.test_archs = []
         self.owner = None
         self.testversion = None
-        self.releases = None
+        self.releases = []
         self.priority = None
         self.destructive = None
         self.license = None
@@ -52,6 +52,7 @@ class TestInfo:
         self.runfor = []
         self.bugs = []
         self.types = []
+        self.needs = []
         self.need_properties = []
         self.siteconfig = []
         self.kickstart = None
@@ -353,9 +354,11 @@ class Parser:
         num_negative_releases = 0
         num_positive_releases = 0
 
+        releases = []
         for release in value.split(" "):
             #print "Got release: release"
 
+            releases.append(release)
             m = re.match('^-(.*)', release)
             if m:
                 cleaned_release = m.group(1)
@@ -368,6 +371,7 @@ class Parser:
 
             if num_negative_releases>0 and num_positive_releases>0:
                 self.handle_warning("Releases field lists both negated and non-negated release names (should be all negated, or all non-negated)")
+        self.info.releases = releases
 
     def handle_archs(self, key, value):
         self.__unique_field(key, 'test_archs', value)
@@ -482,6 +486,7 @@ class Parser:
     def handle_needproperty(self, key, value):
         m = re.match(r'^([A-Za-z0-9]*)\s+(=|>|>=|<|<=)\s+([A-Z:a-z0-9]*)$', value)
         if m:
+            self.info.needs.append(value)
             self.info.need_properties.append((m.group(1), m.group(2), m.group(3)))
         else:
             self.handle_error('"%s" is not a valid %s field; %s'%(value, key, "must be of the form PROPERTYNAME {=|>|>=|<|<=} PROPERTYVALUE"))
@@ -583,7 +588,7 @@ class Parser:
                 handler = fields[key]
                 handler(key, value)
             else:
-                self.handle_error('Unknown field "%s"'%key)
+                self.handle_warning('Unknown field "%s"'%key)
 
         # Postprocessing:
 	# Ensure mandatory fields have values:
@@ -796,7 +801,7 @@ class ReleasesFieldTests(unittest.TestCase):
     def test_releases(self):
         "Ensure Releases field is parsed correctly"
         ti = parse_string("Releases: FC5 FC6", raise_errors=False)
-        self.assertEquals(ti.releases, "FC5 FC6")
+        self.assertEquals(ti.releases, ['FC5', 'FC6'])
 
 class ArchitecturesFieldTests(unittest.TestCase):
     def test_architectures(self):
@@ -809,7 +814,7 @@ class ArchitecturesFieldTests(unittest.TestCase):
         ti = parse_string("""
         Releases: FC5 FC6
         Architectures: i386 x86_64""", raise_errors=False)
-        self.assertEquals(ti.releases, "FC5 FC6")
+        self.assertEquals(ti.releases, ['FC5', 'FC6'])
         self.assertEquals(ti.test_archs, ["i386", "x86_64"])
 
 class RhtsOptionsFieldTests(unittest.TestCase):
