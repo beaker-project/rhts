@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.41
+Version: 4.42
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -180,6 +180,14 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Fri Nov 04 2011 Bill Peck <bpeck@redhat.com> 4.42-1
+- update testinfo.py to be consistent with the version in beaker
+  (dcallagh@redhat.com)
+- fix use of tmpnam in unit tests (dcallagh@redhat.com)
+- fix parsing of Destructive field in testinfo (dcallagh@redhat.com)
+- TestTime with no suffix means seconds (dcallagh@redhat.com)
+- Slight change in error message when uploading file (rmancy@redhat.com)
+
 * Fri Sep 30 2011 Bill Peck <bpeck@redhat.com> 4.41-1
 - rhts-create-new-test is not needed anymore (bpeck@redhat.com)
 
