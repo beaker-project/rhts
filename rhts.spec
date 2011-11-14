@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.42
+Version: 4.43
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -180,6 +180,10 @@ fi
 %doc doc/runtest.sh.template
 
 %changelog
+* Mon Nov 14 2011 Bill Peck <bpeck@redhat.com> 4.43-1
+- test times can be longer than 6 hours.  For example: reservesys
+  (bpeck@redhat.com)
+
 * Fri Nov 04 2011 Bill Peck <bpeck@redhat.com> 4.42-1
 - update testinfo.py to be consistent with the version in beaker
   (dcallagh@redhat.com)
