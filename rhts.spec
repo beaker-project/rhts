@@ -26,6 +26,7 @@ Group: Development/Libraries
 Obsoletes: rhts-rh-devel
 Provides: rhts-rh-devel
 Requires: rhts-test-env = %{version}
+Requires: rhts-python = %{version}
 Requires: beaker-client
 Requires: tar
 Requires: sed
@@ -47,6 +48,7 @@ Obsoletes: rhts-devel-test-env
 Provides: rhts-devel-test-env
 Obsoletes: rhts-legacy
 Provides: rhts-legacy
+Requires: rhts-python = %{version}
 Requires: beakerlib
 %if 0%{?rhel}%{?fedora} > 4
 Requires(post): policycoreutils
@@ -55,6 +57,14 @@ Requires(post): policycoreutils
 %description test-env
 This package contains components of the test system used when running 
 tests, either on a developer's workstation, or within a lab.
+
+%package python
+Summary:        Python module for test development
+Group:          Development/Libraries
+
+%description python
+This package provides the rhts Python module, for use by rhts scripts and 
+related programs.
 
 %prep
 %setup -q
@@ -156,7 +166,6 @@ fi
 %if 0%{?rhel}%{?fedora} > 4
 %{_datadir}/selinux/packages/%{name}/rhts.pp
 %endif
-%{python_sitelib}/%{name}*
 /mnt/scratchspace
 %attr(1777,root,root)/mnt/testarea
 %doc doc/README
@@ -178,6 +187,10 @@ fi
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-diff-since-last-tag
 %doc doc/Makefile.template
 %doc doc/runtest.sh.template
+
+%files python
+%defattr(-,root,root)
+%{python_sitelib}/%{name}*
 
 %changelog
 * Mon Nov 14 2011 Bill Peck <bpeck@redhat.com> 4.43-1
