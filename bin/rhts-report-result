@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material 
 # is made available to anyone wishing to use, modify, copy, or 
 # redistribute it subject to the terms and conditions of the GNU General 
@@ -28,32 +28,27 @@ if [ $# -lt 3 -o $# -gt 4 ]; then
 	exit 1
 fi
 
+declare -a options
+
 if [ -n "$4" ]; then
-    resultvalue="--resultvalue=$4"
+    options[${#options[@]}]="--resultvalue=$4"
 fi
 
 # echo Reporting test $1 as $2 > /dev/stderr
 dmesg -c > /mnt/testarea/dmesg.log
 
-if [ "$RESULT_SERVER+is_not_set" = "+is_not_set" ]; then 
-		SERVER_OPTIONS=""
-else
-		SERVER_OPTIONS="--server=$RESULT_SERVER"
+if [ -n "$RESULT_SERVER" ] ; then
+    options[${#options[@]}]="--server=$RESULT_SERVER"
 fi
 
-if [ "$RECIPETESTID+is_not_set" = "+is_not_set" ]; then 
-		RECIPETESTID_OPTIONS=""
-else
-		RECIPETESTID_OPTIONS="--testid=$RECIPETESTID"
+if [ -n "$RECIPETESTID" ] ; then
+    options[${#options[@]}]="--testid=$RECIPETESTID"
 fi
 
 rhts-db-submit-result \
-	--testname=$1 \
-	--result=$2 \
-	--log=$3 \
-	$resultvalue \
-	$SERVER_OPTIONS \
-	--testversion=$TESTVERSION \
-	--dmesg=/mnt/testarea/dmesg.log \
-	$RECIPETESTID_OPTIONS 
-
+        --testname="$1" \
+        --result="$2" \
+        --log="$3" \
+        "${options[@]}" \
+        --testversion="$TESTVERSION" \
+        --dmesg=/mnt/testarea/dmesg.log
