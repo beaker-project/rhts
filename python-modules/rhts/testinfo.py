@@ -58,6 +58,7 @@ class TestInfo:
         self.kickstart = None
         self.options = []
         self.environment = {}
+        self.provides = []
 
     def output_string_field(self, file, fileFieldName, dictFieldName):
         value = self.__dict__[dictFieldName]
@@ -108,6 +109,7 @@ class TestInfo:
         self.output_string_list_field(file, 'Type', 'types')
         self.output_string_list_field(file, 'RhtsOptions', 'options')
         self.output_string_dict_field(file, 'Environment', 'environment')
+        self.output_string_list_field(file, 'Provides', 'provides')
         for (name, op, value) in self.need_properties:
             file.write('NeedProperty: %s %s %s\n'%(name, op, value))
         file.write(self.generate_siteconfig_lines())
@@ -480,6 +482,10 @@ class Parser:
         for pkgname in value.split(" "):
             self.info.rhtsrequires.append(pkgname)
 
+    def handle_provides(self, key, value):
+        for pkgname in value.split(" "):
+            self.info.provides.append(pkgname)
+
     def handle_needproperty(self, key, value):
         m = re.match(r'^([A-Za-z0-9]*)\s+(=|>|>=|<|<=)\s+([A-Z:a-z0-9]*)$', value)
         if m:
@@ -542,6 +548,7 @@ class Parser:
                   'Want': self.handle_deprecated_for_needproperty,
                   'WantProperty': self.handle_deprecated_for_needproperty,
                   'Kickstart': self.handle_kickstart,
+                  'Provides': self.handle_provides,
                   }
 
         self.lineNum = 0;
