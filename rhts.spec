@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.43
+Version: 4.44
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -193,6 +193,11 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Tue Jan 24 2012 Bill Peck <bpeck@redhat.com> 4.44-1
+- [RFE] add Provides: ability to test Makefile. (bpeck@redhat.com)
+- split rhts python module into its own subpackage (dcallagh@redhat.com)
+- internal variable value not quoted (dcallagh@redhat.com)
+
 * Mon Nov 14 2011 Bill Peck <bpeck@redhat.com> 4.43-1
 - test times can be longer than 6 hours.  For example: reservesys
   (bpeck@redhat.com)
