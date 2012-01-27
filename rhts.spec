@@ -61,6 +61,7 @@ tests, either on a developer's workstation, or within a lab.
 %package python
 Summary:        Python module for test development
 Group:          Development/Libraries
+Conflicts:      rhts-test-env < 4.44
 
 %description python
 This package provides the rhts Python module, for use by rhts scripts and 
