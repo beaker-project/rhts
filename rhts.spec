@@ -4,7 +4,7 @@
 Name: rhts
 Summary: Automated software testing
 Version: 4.44
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/Libraries
 License: GPL
 Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
@@ -194,6 +194,9 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Fri Jan 27 2012 Dan Callaghan <dcallagh@redhat.com> 4.44-2
+- add Conflicts to rhts-python for old rhts-test-env (dcallagh@redhat.com)
+
 * Tue Jan 24 2012 Bill Peck <bpeck@redhat.com> 4.44-1
 - [RFE] add Provides: ability to test Makefile. (bpeck@redhat.com)
 - split rhts python module into its own subpackage (dcallagh@redhat.com)
