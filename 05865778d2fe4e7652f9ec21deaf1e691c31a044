@@ -1,0 +1,9 @@
+Change-Id: I05865778d2fe4e7652f9ec21deaf1e691c31a044
+Code-Review+2: Dan Callaghan <dcallagh@redhat.com>
+Verified+1: Dan Callaghan <dcallagh@redhat.com>
+Code-Review+2: Bill Peck <bpeck@redhat.com>
+Submitted-by: Bill Peck <bpeck@redhat.com>
+Submitted-at: Mon, 27 Feb 2012 16:41:33 -0500
+Reviewed-on: http://gerrit.beaker-project.org/918
+Project: rhts
+Branch: refs/heads/master
