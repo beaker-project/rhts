@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.45
+Version: 4.46
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -195,6 +195,11 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Wed Feb 29 2012 Bill Peck <bpeck@redhat.com> 4.46-1
+- Added consistent identifier for bugs but test name remains the same
+  (isenfeld@redhat.com)
+- Update the beaker-wizard to work with Git (psplicha@redhat.com)
+
 * Thu Feb 23 2012 Bill Peck <bpeck@redhat.com> 4.45-1
 - Add make to dependencies (mcsontos@redhat.com)
 
