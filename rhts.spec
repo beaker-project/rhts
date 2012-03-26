@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.46
+Version: 4.47
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -195,6 +195,10 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Mon Mar 26 2012 Bill Peck <bpeck@redhat.com> 4.47-1
+- rhts-test-runner overrides PATH adjusted by tortilla wrapper
+  (bpeck@redhat.com)
+
 * Wed Feb 29 2012 Bill Peck <bpeck@redhat.com> 4.46-1
 - Added consistent identifier for bugs but test name remains the same
   (isenfeld@redhat.com)
