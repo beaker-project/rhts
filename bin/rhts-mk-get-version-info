@@ -22,7 +22,11 @@ OPTION="$1"
 TAG="$2"
 
 # defaults
-VERSION="1.0"
+if [ -n "$TESTVERSION" ]; then
+   VERSION="$TESTVERSION"
+else
+   VERSION="1.0"
+fi
 RELEASE="0"
 
 if [ -n "$TAG" ]; then
