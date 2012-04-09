@@ -121,21 +121,21 @@ mkdir -p $RPM_BUILD_ROOT/mnt/testarea
 %post test-env
 %if 0%{?rhel}%{?fedora} > 4
 if [ "$1" -le "1" ] ; then # First install
-semodule -i %{_datadir}/selinux/packages/%{name}/rhts.pp 2>/dev/null || :
+semodule -i %{_datadir}/selinux/packages/%{name}/rhts.pp || :
 fi
 %endif
 
 %preun test-env
 %if 0%{?rhel}%{?fedora} > 4
 if [ "$1" -lt "1" ] ; then # Final removal
-semodule -r rhts 2>/dev/null || :
+semodule -r rhts || :
 fi
 %endif
 
 %postun test-env
 %if 0%{?rhel}%{?fedora} > 4
 if [ "$1" -ge "1" ] ; then # Upgrade
-semodule -i %{_datadir}/selinux/packages/%{name}/rhts.pp 2>/dev/null || :
+semodule -i %{_datadir}/selinux/packages/%{name}/rhts.pp || :
 fi
 %endif
 
