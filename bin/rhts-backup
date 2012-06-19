@@ -1,6 +1,7 @@
 #!/bin/sh
 PATH=/sbin:/usr/sbin:$PATH
-[ -d "/selinux" ] && SELINUX=true || SELINUX=false
+selinuxenabled >/dev/null 2>/dev/null && SELINUX=true || SELINUX=false
+#[ -d "/selinux" ] && SELINUX=true || SELINUX=false
 
 usage="Usage: $0 [OPTION] [FILE]...
 Create a backup of each listed FILE, recursively for directories that will
