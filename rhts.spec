@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.48
+Version: 4.49
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -195,6 +195,14 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Thu Jun 21 2012 Bill Peck <bpeck@redhat.com> 4.49-1
+- /usr/bin/rhts-backup and /usr/bin/rhts-restore doesn't preserve selinux
+  context (bpeck@redhat.com)
+- beaker-wizard: Update valid releases [BZ#828338] (psplicha@redhat.com)
+- beaker-wizard: Do not replace existing files with attachments [BZ#797244]
+  (isenfeld@redhat.com)
+- BeakerLib has moved (long time ago) to /usr/share (psplicha@redhat.com)
+
 * Thu Apr 12 2012 Bill Peck <bpeck@redhat.com> 4.48-1
 - rhts-mk-get-version-info should use $TESTVERSION (bpeck@redhat.com)
 
