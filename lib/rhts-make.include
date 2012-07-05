@@ -77,7 +77,7 @@ help:
 	@echo "    arch-rpm:  build an arch-specific RPM package of the test, with compilation happening at build time"
 	@echo "         rpm:  synonym for 'noarch-rpm'"
 	@echo "     package:  synonym for 'noarch-rpm'"
-	@echo "      submit:  upload the test RPM to TESTSERVER via XML-RPC"
+	@echo "      bkradd:  upload the test RPM using bkr task-add"
 	@echo ""
 	@echo "Targets supplied by common Makefile for overriding by tests are:"
 	@echo "      install:  install the test sources into INSTALL_DIR"
@@ -88,16 +88,13 @@ help:
 	@echo "       clean:  clean the directory"
 	@echo ""
 
-# submit: submit the test package to RHTS
-
 TESTSERVER ?= rhts.redhat.com
-submit: $(METADATA) snake-submit
-	rhts-mk-build-package -s $(TESTSERVER)
-	rm $(METADATA)
+submit:
+	echo "Sorry! RHTS doesn't exist anymore. Try make bkradd instead." ; exit 1
 
+.INTERMEDIATE: $(METADATA)
 bkradd: $(METADATA) snake-submit
 	rhts-mk-build-package -b
-	rm $(METADATA)
 
 SNAKESERVER ?= $(TESTSERVER)
 snake-submit:

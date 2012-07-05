@@ -133,7 +133,7 @@ if [ -n "$TESTSERVER" ]; then
 elif [ -n "$BEAKER" ]; then
     pushd $INSTALL_DIR
     for RPM in $(find . -name \*.rpm); do
-        bkr task-add $RPM
+        bkr task-add $RPM || exit 1
     done
     popd
 else
