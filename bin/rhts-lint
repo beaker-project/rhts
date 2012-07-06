@@ -13,6 +13,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # Author: David Malcolm
+
+import sys
 import fileinput
 import unittest
 import rhts.testinfo
@@ -36,5 +38,5 @@ if __name__=='__main__':
     input = fileinput.input()
     p = rhts.testinfo.StdoutParser(__DeferredFileInputFilenameString())
     p.parse(input)
-    
-    
+    if p.numErrors or p.numWarnings:
+        sys.exit(1)
