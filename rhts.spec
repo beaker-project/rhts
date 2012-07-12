@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.49
+Version: 4.50
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -195,6 +195,14 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Thu Jul 12 2012 Bill Peck <bpeck@redhat.com> 4.50-1
+- beaker-wizard: Abort when environment is not ready [BZ#838575]
+  (psplicha@redhat.com)
+- rhts-lint: exit non-zero if errors or warnings are found
+  (dcallagh@redhat.com)
+- accurate exit status for `make bkradd` (dcallagh@redhat.com)
+- tito config for releasing in dist-git (dcallagh@redhat.com)
+
 * Thu Jun 21 2012 Bill Peck <bpeck@redhat.com> 4.49-1
 - /usr/bin/rhts-backup and /usr/bin/rhts-restore doesn't preserve selinux
   context (bpeck@redhat.com)
