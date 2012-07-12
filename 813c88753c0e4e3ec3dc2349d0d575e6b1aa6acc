@@ -1,0 +1,8 @@
+Change-Id: I813c88753c0e4e3ec3dc2349d0d575e6b1aa6acc
+Code-Review+2: Bill Peck <bpeck@redhat.com>
+Verified+1: Bill Peck <bpeck@redhat.com>
+Submitted-by: Bill Peck <bpeck@redhat.com>
+Submitted-at: Thu, 12 Jul 2012 12:55:04 -0400
+Reviewed-on: http://gerrit.beaker-project.org/1189
+Project: rhts
+Branch: refs/heads/master
