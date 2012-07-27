@@ -4,7 +4,7 @@ PUBLIC_SHELL_SCRIPTS := rhts-run-package rhts-backup rhts-restore \
          rhts-system-info rhts-test-runner.sh rhts-extend
 PUBLIC_PYTHON_SCRIPTS := rhts-lint beaker-wizard rhts-abort rhts-db-submit-result \
          rhts-recipe-sync-block rhts-recipe-sync-set rhts-sync-block rhts-sync-set \
-         rhts-submit-log rhts-test-checkin rhts-test-update
+         rhts-submit-log rhts-test-checkin rhts-test-update rhts-power
 
 # "Private" scripts, intended to be invoked by the Makefile, rather than directly
 # We install these to /usr/libexec/rhts:
