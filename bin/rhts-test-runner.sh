@@ -65,6 +65,12 @@ function report_finish {
 
     #Restore any files tagged by the test..
     rhts-restore
+
+    #Clear audit.log* to prevent any future denails from being reported again
+    for log in /var/log/audit/*; do
+        > $log
+    done
+
     logger -s "$0 report_finish stop..."
 }
 
