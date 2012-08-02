@@ -1,0 +1,8 @@
+#!/usr/bin/python
+
+import sys
+import os
+import rhts.timeout_xmlrpclib
+
+server = rhts.timeout_xmlrpclib.Server('http://%s:8000/RPC2' % os.environ['LAB_CONTROLLER'])
+print server.power(sys.argv[1], sys.argv[2])

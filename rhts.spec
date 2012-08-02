@@ -162,6 +162,7 @@ fi
 %attr(0755, root, root)%{_bindir}/rhts-test-checkin
 %attr(0755, root, root)%{_bindir}/rhts-test-update
 %attr(0755, root, root)%{_bindir}/rhts-extend
+%attr(0755, root, root)%{_bindir}/rhts-power
 %{_datadir}/%{name}/lib/rhts-make.include
 %{_datadir}/%{name}/failurestrings
 %{_datadir}/%{name}/falsestrings
