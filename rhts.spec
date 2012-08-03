@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.50
+Version: 4.51
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -196,6 +196,11 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Fri Aug 03 2012 Bill Peck <bpeck@redhat.com> 4.51-1
+- test env command for sending power commands (dcallagh@redhat.com)
+- clean out some old junk (dcallagh@redhat.com)
+- AVC subtest provide incorrect results on RHEL7 (bpeck@redhat.com)
+
 * Thu Jul 12 2012 Bill Peck <bpeck@redhat.com> 4.50-1
 - beaker-wizard: Abort when environment is not ready [BZ#838575]
   (psplicha@redhat.com)
