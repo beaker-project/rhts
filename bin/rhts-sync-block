@@ -33,7 +33,11 @@ testorder = ''
 hostname = ''
 
 USAGE_TEXT = """
-Usage: rhts-sync-block -s <STATE> [-s <STATE>] <MACHINE> [<MACHINE>] [<MACHINE>]
+Usage: rhts-sync-block -s <STATE> [-s <STATE>] [--any] <MACHINE> [<MACHINE>] [<MACHINE>]
+
+Options:
+ -s, --state	The state to look for, if repeated the machine(s) can be in any of the states.
+ --any		Changes it so that only one machine needs to match the state(s)
 """
 def isset(x):
     if x:
@@ -41,7 +45,7 @@ def isset(x):
     else:
        return 0
 
-def sync_block(states,machines):
+def sync_block(states,machines,any_machine):
     global result_server, hostname, recipesetid, testorder
     result_server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % result_server
 
@@ -57,9 +61,17 @@ def sync_block(states,machines):
     client = xmlrpclib.Server(result_server)
     curr_states = []
     CONSOLE = open("/dev/console", "w")
-    while not curr_states:
+    while True:
         try:
-            curr_states = client.sync.block(recipesetid,testorder,result_server,states,machines)
+            if any_machine:
+                for machine in machines:
+                    curr_states.extend(client.sync.block(recipesetid,testorder,result_server,states,[machine]))
+                if curr_states:
+                    break
+            else:
+                curr_states = client.sync.block(recipesetid,testorder,result_server,states,machines)
+                if curr_states:
+                    break
         except socket.timeout:
             CONSOLE.write('rhts-sync-block Timeout!\n')
         except:
@@ -84,9 +96,10 @@ def main():
         testorder = os.environ['TESTORDER']
 
     states = []
+    any_machine = False
     args = sys.argv[1:]
     try:
-        opts, args = getopt.getopt(args, 'r:t:s:R:', ['result_server='])
+        opts, args = getopt.getopt(args, 'r:t:s:R:', ['state=', 'result_server=', 'recipesetid=', 'testorder=', 'any'])
     except:
         usage()
     for opt, val in opts:
@@ -98,6 +111,8 @@ def main():
             recipesetid = val
         if opt in ('-t', '--testorder'):
             testorder = val
+        if opt in ('--any'):
+            any_machine = True
 
     machines = args[0:]
     machines = filter(isset,machines)
@@ -114,7 +129,7 @@ def main():
         resp = raw_input()
 	print resp
     else:
-        sync_block(states,machines)
+        sync_block(states,machines,any_machine)
 
 if __name__ == '__main__':
     main()
