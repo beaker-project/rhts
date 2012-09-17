@@ -32,6 +32,8 @@ Requires: tar
 Requires: sed
 Requires: make
 Requires: rpm-build
+# beaker-wizard was moved from here to beaker-client in 0.9.4
+Conflicts: beaker-client < 0.9.4
 
 %description devel
 This package contains components of the test system used when running 
@@ -175,7 +177,6 @@ fi
 
 %files devel
 %defattr(-,root,root)
-%attr(0755, root, root)%{_bindir}/beaker-wizard
 %attr(0755, root, root)%{_bindir}/rhts-lint
 %attr(0755, root, root)%{_bindir}/rhts-run-package
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-build-package
