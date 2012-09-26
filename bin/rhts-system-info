@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 PATH=/sbin:/usr/sbin:$PATH
 
 SLABLOG=$(mktemp -p /mnt/testarea -t Slab.XXXXXX)

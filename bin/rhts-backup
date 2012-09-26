@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 PATH=/sbin:/usr/sbin:$PATH
 selinuxenabled >/dev/null 2>/dev/null && SELINUX=true || SELINUX=false
 #[ -d "/selinux" ] && SELINUX=true || SELINUX=false
