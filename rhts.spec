@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.51
+Version: 4.52
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -197,6 +197,12 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Fri Sep 28 2012 Dan Callaghan <dcallagh@redhat.com> 4.52-1
+- moved beaker-wizard to beaker-client package (dcallagh@redhat.com)
+- add ability to timeout in rhts-sync-block (bpeck@redhat.com)
+- rhts-sync-block -- catching state from arbitrary machine (bpeck@redhat.com)
+- rhts selinux module fails to load on RHEL-7.0-20120711.2 (bpeck@redhat.com)
+
 * Fri Aug 03 2012 Bill Peck <bpeck@redhat.com> 4.51-1
 - test env command for sending power commands (dcallagh@redhat.com)
 - clean out some old junk (dcallagh@redhat.com)
