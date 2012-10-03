@@ -55,20 +55,25 @@ def sync_block(states,machines,any_machine,timeout):
     curr_states = []
     CONSOLE = open("/dev/console", "w")
     while True:
-        try:
-            if any_machine:
-                for machine in machines:
+        if any_machine:
+            for machine in machines:
+                try:
                     curr_states.extend(client.sync.block(recipesetid,-1,result_server,states,[machine]))
+                except socket.timeout:
+                    CONSOLE.write('rhts-recipe-sync-block Timeout!\n')
+                except Exception, e:
+                    CONSOLE.write('rhts-recipe-sync-block: %s\n' % e)
                 if curr_states:
                     break
-            else:
+        else:
+            try:
                 curr_states = client.sync.block(recipesetid,-1,result_server,states,machines)
-                if curr_states:
-                    break
-        except socket.timeout:
-            CONSOLE.write('rhts-sync-block Timeout!\n')
-        except:
-            pass
+            except socket.timeout:
+                CONSOLE.write('rhts-recipe-sync-block Timeout!\n')
+            except Exception, e:
+                CONSOLE.write('rhts-recipe-sync-block: %s\n' % e)
+        if curr_states:
+            break
         if timeout and datetime.datetime.now() > timeout:
             CONSOLE.write('rhts-sync-block --timeout exceeded\n')
             return 1
