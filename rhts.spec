@@ -4,7 +4,7 @@
 Name: rhts
 Summary: Automated software testing
 Version: 4.52
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/Libraries
 License: GPL
 Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
@@ -197,6 +197,9 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Thu Oct 04 2012 Dan Callaghan <dcallagh@redhat.com> 4.52-2
+- fix for bz526348 (bpeck@redhat.com)
+
 * Fri Sep 28 2012 Dan Callaghan <dcallagh@redhat.com> 4.52-1
 - moved beaker-wizard to beaker-client package (dcallagh@redhat.com)
 - add ability to timeout in rhts-sync-block (bpeck@redhat.com)
