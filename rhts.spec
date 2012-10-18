@@ -4,7 +4,7 @@
 Name: rhts
 Summary: Automated software testing
 Version: 4.52
-Release: 2%{?dist}
+Release: 3%{?dist}
 Group: Development/Libraries
 License: GPL
 Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
@@ -197,6 +197,11 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Thu Oct 18 2012 Dan Callaghan <dcallagh@redhat.com> 4.52-3
+- Fix package name regex in mk-generate-specfile
+  (Nikolai.Kondrashov@redhat.com)
+- Use bash explicitly for bash scripts (Nikolai.Kondrashov@redhat.com)
+
 * Thu Oct 04 2012 Dan Callaghan <dcallagh@redhat.com> 4.52-2
 - fix for bz526348 (bpeck@redhat.com)
 
