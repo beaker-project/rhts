@@ -46,7 +46,7 @@ fi
 
 # for git, do the same thing we do for cvs
 if git log -1 &>/dev/null; then
-        CURRENT_TAG=$(git for-each-ref --count=1 --sort=-taggerdate --format="%(refname)" "refs/tags/${PACKAGE_NAME}*" | cut -c 11-)
+        CURRENT_TAG=$(git for-each-ref --count=1 --sort=-taggerdate --format="%(refname)" "refs/tags/${PACKAGE_NAME}-${CURRENT_VERSION}-*" | cut -c 11-)
         if [ -n "$CURRENT_TAG" -a "$(git cat-file -t refs/tags/${CURRENT_TAG})" != "tag" ] ; then
             # As of version 4.33, we create "annotated"/"heavyweight" tags 
             # so that we can reliably sort by taggerdate above. But if we get 
@@ -55,10 +55,10 @@ if git log -1 &>/dev/null; then
             # right tag...
             if sort --version-sort /dev/null 2>/dev/null >/dev/null ; then
                 # If we have `sort --version-sort` that works best
-                CURRENT_TAG=$(git for-each-ref --format="%(refname)" "refs/tags/${PACKAGE_NAME}*" | cut -c 11- | sort --version-sort | tail -n1)
+                CURRENT_TAG=$(git for-each-ref --format="%(refname)" "refs/tags/${PACKAGE_NAME}-${CURRENT_VERSION}-*" | cut -c 11- | sort --version-sort | tail -n1)
             else
                 # All we can do is sort by commiterdate and hope for the best...
-                CURRENT_TAG=$(git for-each-ref --count=1 --sort=-committerdate --format="%(refname)" "refs/tags/${PACKAGE_NAME}*" | cut -c 11-)
+                CURRENT_TAG=$(git for-each-ref --count=1 --sort=-committerdate --format="%(refname)" "refs/tags/${PACKAGE_NAME}-${CURRENT_VERSION}-*" | cut -c 11-)
             fi
         fi
 fi
