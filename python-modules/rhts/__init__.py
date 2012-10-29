@@ -13,6 +13,8 @@ import socket
 import time
 import os
 import os.path
+import shutil
+import tempfile
 import base64
 import OpenSSL.SSL
 import traceback
@@ -145,60 +147,71 @@ def uploadWrapper(session, localfile, recipetestid, name=None, callback=None, bl
     retries=3
     if name is None:
         name = os.path.basename(localfile)
-    fo = file(localfile, "r")  #specify bufsize?
-    totalsize = os.path.getsize(localfile)
-    ofs = start
-    if ofs != 0:
-        fo.seek(ofs)
-    digest_constructor = get_digest_contructor()
-    digestor = digest_constructor()
-    debug = False
-    if callback:
-        callback(0, totalsize, 0, 0, 0)
-    while ofs <= totalsize:
-        if (totalsize - ofs) < blocksize:
-            blocksize = totalsize - ofs
-        lap = time.time()
-        contents = fo.read(blocksize)
-        digestor.update(contents)
-        size = len(contents)
-        data = base64.encodestring(contents)
-        if size == 0:
-            # end of file, use offset = -1 to finalize upload
-            offset = -1
-            digest = digestor.hexdigest()
-            sz = ofs
-        else:
-            offset = ofs
-            digest = digest_constructor(contents).hexdigest()
-            sz = size
-        del contents
-        tries = 0
-        while True:
-            if debug:
-                print "uploadFile(%r,%r,%r,%r,%r,...)" %(recipetestid,name,sz,digest,offset)
-            if callMethod(session, 'results.uploadFile', recipetestid, name, sz, digest, offset, data):
-                break
-            if tries <= retries:
-                tries += 1
-                continue
-            else:
-                raise GenericError, "Error uploading file %s, offset %d" %(name, offset)
-        if size == 0:
-            break
-        ofs += size
-        now = time.time()
-        t1 = now - lap
-        if t1 <= 0:
-            t1 = 1
-        t2 = now - started
-        if t2 <= 0:
-            t2 = 1
-        if debug:
-            print "Uploaded %d bytes in %f seconds (%f kbytes/sec)" % (size,t1,size/t1/1024)
-        if debug:
-            print "Total: %d bytes in %f seconds (%f kbytes/sec)" % (ofs,t2,ofs/t2/1024)
+
+    tmpfile = None
+    try:
+        if localfile.startswith("/sys/") or localfile.startswith("/proc/"):
+            tmpfile = tempfile.mktemp() # No tempfile.mkstemp() in 2.2 (RHEL3)
+            shutil.copy(localfile, tmpfile)
+            localfile = tmpfile
+
+        fo = file(localfile, "r")  #specify bufsize?
+        totalsize = os.path.getsize(localfile)
+        ofs = start
+        if ofs != 0:
+            fo.seek(ofs)
+        digest_constructor = get_digest_contructor()
+        digestor = digest_constructor()
+        debug = False
         if callback:
-            callback(ofs, totalsize, size, t1, t2)
-    fo.close()
+            callback(0, totalsize, 0, 0, 0)
+        while ofs <= totalsize:
+            if (totalsize - ofs) < blocksize:
+                blocksize = totalsize - ofs
+            lap = time.time()
+            contents = fo.read(blocksize)
+            digestor.update(contents)
+            size = len(contents)
+            data = base64.encodestring(contents)
+            if size == 0:
+                # end of file, use offset = -1 to finalize upload
+                offset = -1
+                digest = digestor.hexdigest()
+                sz = ofs
+            else:
+                offset = ofs
+                digest = digest_constructor(contents).hexdigest()
+                sz = size
+            del contents
+            tries = 0
+            while True:
+                if debug:
+                    print "uploadFile(%r,%r,%r,%r,%r,...)" %(recipetestid,name,sz,digest,offset)
+                if callMethod(session, 'results.uploadFile', recipetestid, name, sz, digest, offset, data):
+                    break
+                if tries <= retries:
+                    tries += 1
+                    continue
+                else:
+                    raise GenericError, "Error uploading file %s, offset %d" %(name, offset)
+            if size == 0:
+                break
+            ofs += size
+            now = time.time()
+            t1 = now - lap
+            if t1 <= 0:
+                t1 = 1
+            t2 = now - started
+            if t2 <= 0:
+                t2 = 1
+            if debug:
+                print "Uploaded %d bytes in %f seconds (%f kbytes/sec)" % (size,t1,size/t1/1024)
+            if debug:
+                print "Total: %d bytes in %f seconds (%f kbytes/sec)" % (ofs,t2,ofs/t2/1024)
+            if callback:
+                callback(ofs, totalsize, size, t1, t2)
+        fo.close()
+    finally:
+        if localfile == tmpfile:
+            os.unlink(tmpfile)
 
