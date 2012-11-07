@@ -3,8 +3,8 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.52
-Release: 3%{?dist}
+Version: 4.53
+Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
 Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
@@ -197,6 +197,11 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Wed Nov 07 2012 Dan Callaghan <dcallagh@redhat.com> 4.53-1
+- Copy procfs and sysfs files for uploading (qwan@redhat.com)
+- use stricter glob pattern when searching for current tag
+  (dcallagh@redhat.com)
+
 * Thu Oct 18 2012 Dan Callaghan <dcallagh@redhat.com> 4.52-3
 - Fix package name regex in mk-generate-specfile
   (Nikolai.Kondrashov@redhat.com)
