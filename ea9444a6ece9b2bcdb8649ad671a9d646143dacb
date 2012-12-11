@@ -1,0 +1,8 @@
+Change-Id: I2ddcd65a4831c853a61fd521cf5ad6c69cd49be3
+Code-Review+2: Nick Coghlan <ncoghlan@redhat.com>
+Verified+1: Nick Coghlan <ncoghlan@redhat.com>
+Submitted-by: Nick Coghlan <ncoghlan@redhat.com>
+Submitted-at: Tue, 11 Dec 2012 03:03:34 -0500
+Reviewed-on: http://gerrit.beaker-project.org/1004
+Project: rhts
+Branch: refs/heads/master
