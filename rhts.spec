@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.53
+Version: 4.54
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -197,6 +197,13 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Mon Jan 14 2013 Nick Coghlan <ncoghlan@redhat.com> 4.54-1
+- use RHEL6 selinux policy when %%{dist} is .el6 as well (dcallagh@redhat.com)
+- Fix dist tag for selinux policy load for RHEL 6.0 (asaha@redhat.com)
+- don't hide %%post script errors (bpeck@redhat.com)
+- Prevent 'basename' error spew when task does not have remote git.
+  (asaha@redhat.com)
+
 * Wed Nov 07 2012 Dan Callaghan <dcallagh@redhat.com> 4.53-1
 - Copy procfs and sysfs files for uploading (qwan@redhat.com)
 - use stricter glob pattern when searching for current tag
