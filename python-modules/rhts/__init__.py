@@ -16,8 +16,12 @@ import os.path
 import shutil
 import tempfile
 import base64
-import OpenSSL.SSL
 import traceback
+
+try:
+    from OpenSSL.SSL import Error as ssl_error
+except ImportError:
+    ssl_error = socket.sslerror
 
 def get_digest_contructor():
     dm = os.getenv('DIGEST_METHOD', 'md5').lower()
@@ -133,7 +137,7 @@ def _callMethod(session, name, args, kwargs):
                 return False
         except Fault, fault:
             raise convertFault(fault)
-        except (socket.error,socket.sslerror,xmlrpclib.ProtocolError,OpenSSL.SSL.Error), e:
+        except (socket.error,socket.sslerror,xmlrpclib.ProtocolError,ssl_error), e:
             if debug:
                 print "Try #%d for call (%s) failed: %s" % (tries, name, e)
         time.sleep(interval)
