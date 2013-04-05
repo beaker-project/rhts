@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.54
+Version: 4.55
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -197,6 +197,11 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Fri Apr 05 2013 Dan Callaghan <dcallagh@redhat.com> 4.55-1
+- Import the SSL error exception conditionally (qwan@redhat.com)
+- Add 'cut here' and 'Badness at' as the kernel failure strings
+  (pbunyan@redhat.com)
+
 * Mon Jan 14 2013 Nick Coghlan <ncoghlan@redhat.com> 4.54-1
 - use RHEL6 selinux policy when %%{dist} is .el6 as well (dcallagh@redhat.com)
 - Fix dist tag for selinux policy load for RHEL 6.0 (asaha@redhat.com)
