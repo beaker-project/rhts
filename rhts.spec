@@ -51,7 +51,6 @@ Provides: rhts-devel-test-env
 Obsoletes: rhts-legacy
 Provides: rhts-legacy
 Requires: rhts-python = %{version}
-Requires: beakerlib
 Requires: make
 %if 0%{?rhel}%{?fedora} > 4
 Requires(post): policycoreutils
