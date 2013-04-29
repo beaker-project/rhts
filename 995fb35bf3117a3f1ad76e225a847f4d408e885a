@@ -1,0 +1,8 @@
+Change-Id: I995fb35bf3117a3f1ad76e225a847f4d408e885a
+Verified+1: Dan Callaghan <dcallagh@redhat.com>
+Code-Review+2: Nick Coghlan <ncoghlan@redhat.com>
+Submitted-by: Dan Callaghan <dcallagh@redhat.com>
+Submitted-at: Mon, 29 Apr 2013 01:57:03 -0400
+Reviewed-on: http://gerrit.beaker-project.org/1886
+Project: rhts
+Branch: refs/heads/master
