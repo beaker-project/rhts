@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.55
+Version: 4.56
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPL
@@ -196,6 +196,9 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Fri Jun 07 2013 Amit Saha <asaha@redhat.com> 4.56-1
+- remove Requires: beakerlib (dcallagh@redhat.com)
+
 * Fri Apr 05 2013 Dan Callaghan <dcallagh@redhat.com> 4.55-1
 - Import the SSL error exception conditionally (qwan@redhat.com)
 - Add 'cut here' and 'Badness at' as the kernel failure strings
