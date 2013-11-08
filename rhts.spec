@@ -6,7 +6,7 @@ Summary: Automated software testing
 Version: 4.56
 Release: 1%{?dist}
 Group: Development/Libraries
-License: GPL
+License: GPLv2+
 Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildArch: noarch
