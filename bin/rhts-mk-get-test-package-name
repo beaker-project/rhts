@@ -64,7 +64,7 @@ fi
 if git log -1 &> /dev/null; then
 	REPO_PATH=`echo $TEST | sed -e "s|/|-|g"`
 	REPO_REMOTE=`git config --get branch.master.remote`
-	REPO_URL=`git config --get remote.$REPO_REMOTE.url`
+	REPO_URL=`git config --get remote.$REPO_REMOTE.url | sed -e "s|:|/|"`
 
         if [ -n "$REPO_URL" ]; then
                 REPO_NAME=`basename $REPO_URL | sed -e 's/\.git$//'`
