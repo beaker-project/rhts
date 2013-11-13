@@ -13,27 +13,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see http://www.gnu.org/licenses/.
 
-import xmlrpclib
+"""
+Drop-in replacement for xmlrpclib, with added support for timeouts in the 
+Server class.
+"""
+
+from xmlrpclib import *
 import httplib
 import sys
 
+orig_Server = Server
 def Server(url, *args, **kwargs):
    t = TimeoutTransport()
    t.timeout = kwargs.get('timeout', 20)
    if 'timeout' in kwargs:
        del kwargs['timeout']
    kwargs['transport'] = t
-   server = xmlrpclib.Server(url, *args, **kwargs)
+   server = orig_Server(url, *args, **kwargs)
    return server
 
-class TimeoutTransport(xmlrpclib.Transport):
+class TimeoutTransport(Transport):
 
    def make_connection(self, host):
        if sys.version_info[:2] < (2, 7):
            conn = TimeoutHTTP(host)
            conn.set_timeout(self.timeout)
        else:
-           conn = xmlrpclib.Transport.make_connection(self, host)
+           conn = Transport.make_connection(self, host)
            if self.timeout:
                conn.timeout = self.timeout
        return conn

@@ -71,8 +71,8 @@ def sync_block(states,machines,any_machine,timeout):
             for machine in machines:
                 try:
                     curr_states.extend(client.sync.block(recipesetid,testorder,result_server,states,[machine]))
-                except socket.timeout:
-                    CONSOLE.write('rhts-sync-block Timeout!\n')
+                except xmlrpclib.Fault, e:
+                    pass # assuming it's just a timeout
                 except Exception, e:
                     CONSOLE.write('rhts-sync-block: %s\n' % e)
                 if curr_states:
@@ -80,8 +80,8 @@ def sync_block(states,machines,any_machine,timeout):
         else:
             try:
                 curr_states = client.sync.block(recipesetid,testorder,result_server,states,machines)
-            except socket.timeout:
-                CONSOLE.write('rhts-sync-block Timeout!\n')
+            except xmlrpclib.Fault, e:
+                pass # assuming it's just a timeout
             except Exception, e:
                 CONSOLE.write('rhts-sync-block: %s\n' % e)
         if curr_states:
