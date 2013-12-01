@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.56
+Version: 4.57
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,14 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Mon Dec 02 2013 Dan Callaghan <dcallagh@redhat.com> 4.57-1
+- rhts-reboot can't rely on BootCurrent (dcallagh@redhat.com)
+- suppress XML-RPC fault spam when rhts-sync-block is blocked
+  (dcallagh@redhat.com)
+- update license to GPLv2+ (atodorov@redhat.com)
+- Replace : with / if git URL is like user@example.com:repo so that basename
+  works properly afterwards (atodorov@redhat.com)
+
 * Fri Jun 07 2013 Amit Saha <asaha@redhat.com> 4.56-1
 - remove Requires: beakerlib (dcallagh@redhat.com)
 
