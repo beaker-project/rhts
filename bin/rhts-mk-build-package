@@ -20,7 +20,6 @@
 # Build an RHTS package from a CVS or Subversion working copy of the test
 
 progname=$0
-
 function usage () {
    cat <<EOF
 Usage: $progname [-a] [-d directory] [-b] [-s testserver]
@@ -52,8 +51,7 @@ done
 
 shift $(($OPTIND - 1))
 
-
-NAME=`rhts-mk-get-test-package-name $SOURCE_DIR`
+NAME=`rhts-mk-get-test-package-name -d $SOURCE_DIR`
 CURRENT_TAG=`rhts-mk-get-current-tag $SOURCE_DIR`
 
 VERSION=`rhts-mk-get-version-info -v $CURRENT_TAG`
@@ -120,9 +118,18 @@ pushd $EXTRACT_DIR
 make testinfo.desc || exit $?
 popd
 
+# Historically rhts-mk-get-test-package-name prepended
+# the repo name to the rpm name. We no longer do
+# that, but need to create a 'Provides' for tasks scheduled
+# to run against the old name.
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1044913
+LEGACY_PACKAGE_NAME=`rhts-mk-get-test-package-name -d $SOURCE_DIR -l`
+provides="--provides $LEGACY_PACKAGE_NAME"
+if [ -n "$RHTS_PROVIDES_PACKAGE" ]; then
+    provides="--provides $RHTS_PROVIDES_PACKAGE $provides"
+fi
 echo "Generating specfile: $GENERATED_SPECFILE"
-find $EXTRACT_DIR -name testinfo.desc | rhts-mk-generate-specfile $ABI_OPTIONS $NAME $VERSION $RELEASE > $GENERATED_SPECFILE || exit $?
-
+find $EXTRACT_DIR -name testinfo.desc | rhts-mk-generate-specfile $ABI_OPTIONS $NAME $VERSION $RELEASE $provides  > $GENERATED_SPECFILE || exit $?
 echo "Building package:"
 rpmbuild  -bb --define "_builddir $BUILD_DIR" --define "_sourcedir $GENERATED_SOURCE_DIR"  --define "_rpmdir $INSTALL_DIR" $GENERATED_SPECFILE || exit 1
 

@@ -20,19 +20,24 @@
 # Build an RHTS package from a CVS working copy of the test
 
 function usage {
-	echo "Usage: rhts-mk-get-test-package-name [directory]"
+	echo "Usage: rhts-mk-get-test-package-name  [-d directory] [-l]>"
 }
-if [ $# -gt 1 ]; then
-	usage
-	exit 1
+
+while getopts ":d:l" opt; do
+case $opt in
+
+   l )  USE_LEGACY_PACKAGE_NAME=1 ;;
+   d )  SOURCE_DIR=$OPTARG ;;
+   \?)  usage ;;
+
+   esac
+done
+if [ -z $SOURCE_DIR ]; then
+    SOURCE_DIR=`pwd`
 fi
 
-if [ $# == 1 ]; then
-	SOURCE_DIR="$1"
-else
-	SOURCE_DIR=`pwd`
-fi
 
+get_legacy_package_name () {
 # are we under cvs?
 if [ -d $SOURCE_DIR/CVS ]; then
 	REPO_PATH=`cat $SOURCE_DIR/CVS/Repository | sed -e "s/\//-/g" | sed -e "s/[\.\,\$\:\;\@]/_/g"`
@@ -62,7 +67,7 @@ if hg root &> /dev/null; then
 fi
 
 if git log -1 &> /dev/null; then
-	REPO_PATH=`echo $TEST | sed -e "s|/|-|g"`
+	REPO_PATH=`echo $TEST | sed -e "s|/|-|g" | sed -e "s|-||"`
 	REPO_REMOTE=`git config --get branch.master.remote`
 	REPO_URL=`git config --get remote.$REPO_REMOTE.url | sed -e "s|:|/|"`
 
@@ -72,18 +77,24 @@ if git log -1 &> /dev/null; then
 
 	if [ -n "$REPO_NAME" ]; then
 		# ignore local repos
-		PACKAGE_NAME="$REPO_NAME$REPO_PATH"
+		PACKAGE_NAME="$REPO_NAME-$REPO_PATH"
 	fi
 fi
+}
 
-if [ -z "$PACKAGE_NAME" ]; then
-	# Use "tmp" as the prefix for tests not stored in source control, and 
-	# use the TEST variable name to create a path.
-	# This is really intended to be used from "make rpm", rather that 
-	# called independently
-	REPO_PATH=`echo $TEST | sed -e "s/\//-/g"`
-	REPO_NAME="tmp"
-	PACKAGE_NAME="$REPO_NAME$REPO_PATH"
+if [ -n "$USE_LEGACY_PACKAGE_NAME" ]; then
+    get_legacy_package_name
+    if [ -z "$PACKAGE_NAME" ]; then
+	    # Use "tmp" as the prefix for tests not stored in source control, and 
+    	# use the TEST variable name to create a path.
+    	# This is really intended to be used from "make rpm", rather that 
+    	# called independently
+    	REPO_PATH=`echo $TEST | sed -e "s/\//-/g"`
+    	REPO_NAME="tmp"
+        PACKAGE_NAME="$REPO_PATH"
+    fi
+else
+    PACKAGE_NAME=`echo $TEST | sed -e "s|/|-|g" | sed -e "s|-||"`
 fi
 
 echo "$PACKAGE_NAME"

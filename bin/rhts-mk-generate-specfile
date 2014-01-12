@@ -20,13 +20,14 @@ Tool to generate a specfile, based on a list of testinfo.desc filenames
 """
 import sys
 import re
+import os
 
 import rhts.testinfo
 
 def get_tarball_name(name, version, release):
     return "%s-%s-%s.tar.gz"%(name, version, release)
 
-def generate_specfile(testinfos, name, version, release, strictRequires, strictABI):
+def generate_specfile(testinfos, name, version, release, strictRequires, strictABI, provides):
     """Given a list of Testinfo instances, print a specfile suitable for building a package of the test"""
     assert len(testinfos)>0
 
@@ -55,10 +56,11 @@ def generate_specfile(testinfos, name, version, release, strictRequires, strictA
     print "# Tests need the testing env package to be runnable:"
     print "Requires: rhts-test-env"
     print
+    extra_provides = provides
     for test in testinfos:
         print "# Provides/Requires for test '%s'"%test.test_name
-        print "Provides: test(%s)"%test.test_name
-        for provides in test.provides:
+        print "Provides: test(%s)" % test.test_name
+        for provides in test.provides + extra_provides:
             # RPM Dependency tokens must begin with alpha-numeric, '_' or '/':
             if re.match('^[A-Za-z0-9_/].*$', provides):
                 print "Provides: %s" % provides
@@ -181,6 +183,8 @@ if __name__=='__main__':
                       help="add Requires to RPM metadata based on entries in testinfo.desc files")
     parser.add_option('', "--strict-abi", dest="strictABI", action='store_true', default=False,
                       help="generate a specfile in which compilation is done during the package build, rather than at test time")
+    parser.add_option('', "--provides", dest='provides', action='append',
+        help="Additional provides to pass to spec file")
     (options, args) = parser.parse_args()
     #print options
     #print args
@@ -195,5 +199,7 @@ if __name__=='__main__':
     if len(testinfoFiles)==0:
         print "No testinfo.desc filenames on stdin"
         sys.exit (1)
-    generate_specfile(testinfoFiles, name, version, release, strictRequires=options.strictRequires, strictABI=options.strictABI)
+    generate_specfile(testinfoFiles, name, version, release,
+        strictRequires=options.strictRequires, strictABI=options.strictABI,
+        provides=options.provides)
     

@@ -18,9 +18,6 @@
 # Author: Greg Nichols
 #
 # determine the next available package tag for test package
-
-PACKAGE_NAME=`rhts-mk-get-test-package-name`
-
 CURRENT_TAG=`rhts-mk-get-current-tag`
 
 # Note: the current version according to the CVS tag can be had via:
@@ -33,7 +30,6 @@ if [ -z "$CURRENT_VERSION" ]; then
 fi
 
 CURRENT_RELEASE=`rhts-mk-get-version-info -r $CURRENT_TAG`
-
 let "NEXT_RELEASE = CURRENT_RELEASE + 1"
-
+PACKAGE_NAME=`rhts-mk-get-test-package-name`
 echo $PACKAGE_NAME-$CURRENT_VERSION-$NEXT_RELEASE
