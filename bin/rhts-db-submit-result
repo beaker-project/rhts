@@ -468,6 +468,10 @@ def check_for_errors(dmesg_file):
     #Find error messages in dmesg
     (ret_val, data) = commands.getstatusoutput("/bin/cat %s | /bin/grep -f /usr/share/rhts/failurestrings | grep -v -f /usr/share/rhts/falsestrings" % (dmesg_file))
     if len(data) > 0:
+        # let's try to extract a trace
+        extract_trace = commands.getoutput("/bin/awk '/cut here/,/end trace/ { print }' %s" % (dmesg_file))
+        if extract_trace:
+            data = extract_trace
         data_l = data.split("\n")
     else:
         data_l = []
