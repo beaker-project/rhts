@@ -45,7 +45,8 @@ where valid options are:
   -D <filename>, --dmesg <filename>:  read <filename> as dmesg
   -l <filename>, --log <filename>: read <filename> as the test log
   -d, --debug: show debugging information
-  -q <version>, --testversion <version>: supply the version of the test  
+  -q <version>, --testversion <version>: supply the version of the test
+  -c, --sanity-check: run the tests and exit
 """
 
 # tempfile.mkstemp compatibility:
@@ -459,58 +460,145 @@ def avc_check(error_file, dmesg_file):
 
 
 # Check for error messages in dmesg
-def check_for_errors(dmesg_file):
+def check_for_errors(dmesg_data, failure_strings=None, false_strings=None):
     result = "PASS"
     dmesg_log_file = mktemp_file()
+    if not failure_strings:
+        f1 = open('/usr/share/rhts/failurestrings')
+        failure_strings = f1.readlines()
+        f1.close()
 
-    dmesg_data = "Checking dmesg for specific failures!\n"
-   
-    #Find error messages in dmesg
-    (ret_val, data) = commands.getstatusoutput("/bin/cat %s | /bin/grep -f /usr/share/rhts/failurestrings | grep -v -f /usr/share/rhts/falsestrings" % (dmesg_file))
-    if len(data) > 0:
-        # let's try to extract a trace
-        extract_trace = commands.getoutput("/bin/awk '/cut here/,/end trace/ { print }' %s" % (dmesg_file))
-        if extract_trace:
-            data = extract_trace
-        data_l = data.split("\n")
-    else:
-        data_l = []
+    if not false_strings:
+        f2 = open('/usr/share/rhts/falsestrings')
+        false_strings = f2.readlines()
+        f2.close()
 
-    if len(data_l) != 0:
-        result="FAIL"
-        dmesg_data = dmesg_data + "\n".join(data_l)
-        dmesg_data = dmesg_data + "\n"
+    failure_patterns = []
+    for x in failure_strings:
+        failure_patterns.append(re.compile(x.rstrip('\n')))
+    false_patterns = []
+    for x in false_strings:
+        false_patterns.append(re.compile(x.rstrip('\n')))
 
-        dmesg_data = dmesg_data + "End of log.\n"
+    def match(patterns, line):
+        for p in patterns:
+            if p.search(line):
+                return True
+        return False
+
+    data = []
+    reading_trace = False
+    for line in dmesg_data:
+        line = line.rstrip('\n')
+        if not reading_trace:
+            if match(failure_patterns, line) and \
+               not match(false_patterns, line):
+                data.append(line)
+                if '[ cut here ]' in line:
+                    reading_trace = True
+        else:
+            # we are reading a trace
+            data.append(line)
+            if 'end trace' in line:
+                reading_trace = False
+    if data:
+        result = 'FAIL'
+        errors = ['Checking dmesg for specific failures!']
+        errors.extend(data)
+        errors.append('\nEnd of log.')
+        errors = '\n'.join(errors)
 
         #Write to dmesg_log_file
         LF = open(dmesg_log_file, 'w')
-        LF.write(dmesg_data)
+        LF.write(errors)
         LF.close( )
+        if debug:
+            print "result: %s dmesg_data: %s" % (result, dmesg_log_file)
+        return (result, dmesg_log_file)
+    else:
+        return (result, None)
 
-    if debug:
-        print "result: %s dmesg_data: %s" % (result, dmesg_log_file)
+def test_check_for_errors():
 
-    return (result, dmesg_log_file)
+    dmesg_strings= ['Initializing cgroup subsys cpuset',
+                    'Initializing cgroup subsys cpu',
+                    '------------[ cut here ]------------',
+                    'WARNING: at kernel/rh_taint.c:13 mark_hardware_unsupported+0x39/0x40() (Not tainted)',
+                    'Call Trace:',
+                    '[<ffffffff8106e2e7>] ? warn_slowpath_common+0x87/0xc0',
+                    '[<ffffffff8106e37f>] ? warn_slowpath_fmt_taint+0x3f/0x50',
+                    '[<ffffffff8109f399>] ? mark_hardware_unsupported+0x39/0x40,'
+                    '[<ffffffff81c2d9e2>] ? setup_arch+0xb57/0xb7a',
+                    '[<ffffffff8150d0d1>] ? printk+0x41/0x48',
+                    '[<ffffffff81c27c33>] ? start_kernel+0xdc/0x430',
+                    '[<ffffffff81c2733a>] ? x86_64_start_reservations+0x125/0x129',
+                    '[<ffffffff81c27438>] ? x86_64_start_kernel+0xfa/0x109',
+                    '---[ end trace a7919e7f17c0a725 ]---',
+                    'NMI appears to be stuck',
+                    'Blah blah',
+                    'Badness at',
+                    'blah bloop',
+                    'NMI appears to be stuck',
+                    'blip blop']
+
+    failure_strings = ['Oops',
+                       'BUG',
+                       'NMI appears to be stuck',
+                       'cut here',
+                       'Badness at']
+
+    false_strings = ['BIOS BUG',
+                     'DEBUG']
+
+    expected_dmesg_log = '''Checking dmesg for specific failures!
+------------[ cut here ]------------
+WARNING: at kernel/rh_taint.c:13 mark_hardware_unsupported+0x39/0x40() (Not tainted)
+Call Trace:
+[<ffffffff8106e2e7>] ? warn_slowpath_common+0x87/0xc0
+[<ffffffff8106e37f>] ? warn_slowpath_fmt_taint+0x3f/0x50
+[<ffffffff8109f399>] ? mark_hardware_unsupported+0x39/0x40,[<ffffffff81c2d9e2>] ? setup_arch+0xb57/0xb7a
+[<ffffffff8150d0d1>] ? printk+0x41/0x48
+[<ffffffff81c27c33>] ? start_kernel+0xdc/0x430
+[<ffffffff81c2733a>] ? x86_64_start_reservations+0x125/0x129
+[<ffffffff81c27438>] ? x86_64_start_kernel+0xfa/0x109
+---[ end trace a7919e7f17c0a725 ]---
+NMI appears to be stuck
+Badness at
+NMI appears to be stuck
+
+End of log.'''
+
+    result, dmesg_file = check_for_errors(dmesg_strings,
+                                          failure_strings=failure_strings,
+                                          false_strings=false_strings)
+    assert result=='FAIL'
+    f = open(dmesg_file)
+    actual_dmesg_log = f.read()
+    assert actual_dmesg_log == expected_dmesg_log
+    f.close()
 
 def main():
     global server
     global debug
     
-    dmesg=None
-    dmesgfile=None
-    log=None
-    logfile=None
-    recipetestid=None
-    testname=None
-    result=None
-    resultvalue=0
-    testversion=None
+    dmesg = None
+    dmesgfile = None
+    log = None
+    logfile = None
+    recipetestid = None
+    testname = None
+    result = None
+    resultvalue = 0
+    testversion = None
+    check_sanity = False
     
     args = sys.argv[1:]
     #pprint.pprint(args)
     try:
-        opts, args = getopt.getopt(args, 't:p:r:v:q:D:l:d:f:T:S:', ['testid=', 'dmesg=', 'log=', 'debug=', 'testname=', 'result=', 'resultvalue=', 'testversion=', 'server='])
+        opts, args = getopt.getopt(args, 't:p:r:v:q:D:l:d:f:T:S:c',
+                                   ['testid=', 'dmesg=', 'log=', 'debug=',
+                                    'testname=', 'result=', 'resultvalue=',
+                                    'testversion=', 'server=','check'])
     except:
         usage()
         sys.exit(-1)
@@ -542,6 +630,13 @@ def main():
             server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % val
         if opt in ('-d', '--debug'):
             debug = val
+        if opt in ('-c', '--check'):
+            check_sanity = True
+
+    if check_sanity:
+        test_check_for_errors()
+        print 'Tests OK'
+        sys.exit(0)
 
     console_log=''
 
@@ -558,7 +653,9 @@ def main():
 
     #Check for dmesg errors
     if dmesg:
-        (result, dmesgerrors)=check_for_errors(dmesgfile)
+        f = open('dmesgfile')
+        (result, dmesgerrors) = check_for_errors(f)
+        f.close()
        
         #Report
         if result != "PASS":
