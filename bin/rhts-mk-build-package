@@ -83,8 +83,6 @@ echo "           INSTALL_DIR: $INSTALL_DIR"
 mkdir $INSTALL_DIR || exit 1
 
 BASE_SPECFILE=/usr/share/rhts/lib/rhts-package-tests.spec.in
-GENERATED_SPECFILE=$GENERATED_SOURCE_DIR/$NAME-$VERSION-$RELEASE.spec
-TARBALL=$GENERATED_SOURCE_DIR/$NAME-$VERSION-$RELEASE.tar.gz
 TESTCOVERAGE=$GENERATED_SOURCE_DIR/testcoverage 
 
 # if we are in git, ensure the tag has been pushed
@@ -105,6 +103,24 @@ if git log -1 &>/dev/null ; then
     fi
 fi
 
+# Historically rhts-mk-get-test-package-name prepended
+# the repo name to the rpm name. We no longer do
+# that, but need to create a 'Provides' for tasks scheduled
+# to run against the old name.
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1044913
+LEGACY_PACKAGE_NAME=`rhts-mk-get-test-package-name -d $SOURCE_DIR -l`
+provides="--provides $LEGACY_PACKAGE_NAME"
+if [ -n "$RHTS_PROVIDES_PACKAGE" ]; then
+    provides="--provides $RHTS_PROVIDES_PACKAGE $provides"
+fi
+if [ -z "$RHTS_RPM_NAME" ]; then
+    RHTS_RPM_NAME=$NAME
+else
+    provides="--provides $NAME $provides"
+fi
+GENERATED_SPECFILE=$GENERATED_SOURCE_DIR/$RHTS_RPM_NAME-$VERSION-$RELEASE.spec
+TARBALL=$GENERATED_SOURCE_DIR/$RHTS_RPM_NAME-$VERSION-$RELEASE.tar.gz
+
 echo "Creating tarball: $TARBALL"
 tar --exclude "CVS" --exclude ".svn" --exclude ".git" --exclude "rhts-.\*\.rpm" -zcvf $TARBALL --directory $SOURCE_DIR . || exit 1
 
@@ -118,18 +134,8 @@ pushd $EXTRACT_DIR
 make testinfo.desc || exit $?
 popd
 
-# Historically rhts-mk-get-test-package-name prepended
-# the repo name to the rpm name. We no longer do
-# that, but need to create a 'Provides' for tasks scheduled
-# to run against the old name.
-# See https://bugzilla.redhat.com/show_bug.cgi?id=1044913
-LEGACY_PACKAGE_NAME=`rhts-mk-get-test-package-name -d $SOURCE_DIR -l`
-provides="--provides $LEGACY_PACKAGE_NAME"
-if [ -n "$RHTS_PROVIDES_PACKAGE" ]; then
-    provides="--provides $RHTS_PROVIDES_PACKAGE $provides"
-fi
 echo "Generating specfile: $GENERATED_SPECFILE"
-find $EXTRACT_DIR -name testinfo.desc | rhts-mk-generate-specfile $ABI_OPTIONS $NAME $VERSION $RELEASE $provides  > $GENERATED_SPECFILE || exit $?
+find $EXTRACT_DIR -name testinfo.desc | rhts-mk-generate-specfile $ABI_OPTIONS $RHTS_RPM_NAME $VERSION $RELEASE $provides  > $GENERATED_SPECFILE || exit $?
 echo "Building package:"
 rpmbuild  -bb --define "_builddir $BUILD_DIR" --define "_sourcedir $GENERATED_SOURCE_DIR"  --define "_rpmdir $INSTALL_DIR" $GENERATED_SPECFILE || exit 1
 
