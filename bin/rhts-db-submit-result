@@ -653,7 +653,7 @@ def main():
 
     #Check for dmesg errors
     if dmesg:
-        f = open('dmesgfile')
+        f = open(dmesgfile)
         (result, dmesgerrors) = check_for_errors(f)
         f.close()
        
