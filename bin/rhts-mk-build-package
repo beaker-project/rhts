@@ -51,13 +51,30 @@ done
 
 shift $(($OPTIND - 1))
 
-NAME=`rhts-mk-get-test-package-name -d $SOURCE_DIR`
+# This is currently hardcoded to create legacy package names
+# due to task upgrade issues. See BZ1044913 for further details
+# This can only be overridied with RHTS_RPM_NAME env var
+NAME=`rhts-mk-get-test-package-name -d $SOURCE_DIR -l`
 CURRENT_TAG=`rhts-mk-get-current-tag $SOURCE_DIR`
+
+# Because of the need to use legacy names, we will be adding Provides for
+# new style names. That way, when we do switch to not using legacy names,
+# the "old" packages will have provides for the "new" packages.
+NEW_PACKAGE_NAME=`rhts-mk-get-test-package-name -d $SOURCE_DIR`
+provides="--provides $NEW_PACKAGE_NAME"
+if [ -n "$RHTS_PROVIDES_PACKAGE" ]; then
+    provides="--provides $RHTS_PROVIDES_PACKAGE $provides"
+fi
+# Unless we have passed in an RPM name, use the one decided
+# for us
+if [ -z "$RHTS_RPM_NAME" ]; then
+    RHTS_RPM_NAME=$NAME
+fi
 
 VERSION=`rhts-mk-get-version-info -v $CURRENT_TAG`
 RELEASE=`rhts-mk-get-version-info -r $CURRENT_TAG`
 echo "           CURRENT_TAG: $CURRENT_TAG"
-echo "                  NAME: $NAME"
+echo "                  NAME: $RHTS_RPM_NAME"
 echo "               VERSION: $VERSION"
 echo "               RELEASE: $RELEASE"
 echo "            SOURCE_DIR: $SOURCE_DIR"
@@ -103,21 +120,6 @@ if git log -1 &>/dev/null ; then
     fi
 fi
 
-# Historically rhts-mk-get-test-package-name prepended
-# the repo name to the rpm name. We no longer do
-# that, but need to create a 'Provides' for tasks scheduled
-# to run against the old name.
-# See https://bugzilla.redhat.com/show_bug.cgi?id=1044913
-LEGACY_PACKAGE_NAME=`rhts-mk-get-test-package-name -d $SOURCE_DIR -l`
-provides="--provides $LEGACY_PACKAGE_NAME"
-if [ -n "$RHTS_PROVIDES_PACKAGE" ]; then
-    provides="--provides $RHTS_PROVIDES_PACKAGE $provides"
-fi
-if [ -z "$RHTS_RPM_NAME" ]; then
-    RHTS_RPM_NAME=$NAME
-else
-    provides="--provides $NAME $provides"
-fi
 GENERATED_SPECFILE=$GENERATED_SOURCE_DIR/$RHTS_RPM_NAME-$VERSION-$RELEASE.spec
 TARBALL=$GENERATED_SOURCE_DIR/$RHTS_RPM_NAME-$VERSION-$RELEASE.tar.gz
 

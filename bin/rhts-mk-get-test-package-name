@@ -91,7 +91,7 @@ if [ -n "$USE_LEGACY_PACKAGE_NAME" ]; then
     	# called independently
     	REPO_PATH=`echo $TEST | sed -e "s/\//-/g"`
     	REPO_NAME="tmp"
-        PACKAGE_NAME="$REPO_PATH"
+        PACKAGE_NAME="$REPO_NAME$REPO_PATH"
     fi
 else
     PACKAGE_NAME=`echo $TEST | sed -e "s|/|-|g" | sed -e "s|-||"`
