@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.57
+Version: 4.58
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,14 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Fri Jan 31 2014 Raymond Mancy <rmancy@redhat.com> 4.58-1
+- Use legacy package names, add Provides for new package names.
+  (rmancy@redhat.com)
+- Fix a issue in 687ddd6da91e916b0f5168fb67e625e845354fca (asaha@redhat.com)
+- rhts-db-submit-result: improve dmesg error extraction (asaha@redhat.com)
+- Allowing forcing a particular task RPM name (ncoghlan@redhat.com)
+- Extract kernel trace in case of a failure (asaha@redhat.com)
+
 * Mon Dec 02 2013 Dan Callaghan <dcallagh@redhat.com> 4.57-1
 - rhts-reboot can't rely on BootCurrent (dcallagh@redhat.com)
 - suppress XML-RPC fault spam when rhts-sync-block is blocked
