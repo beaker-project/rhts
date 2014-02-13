@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.58
+Version: 4.59
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,9 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Thu Feb 13 2014 Nick Coghlan <ncoghlan@redhat.com> 4.59-1
+- Add 'arm', 'armhfp' & 'aarch64' to the list of allowed archs. (asaha@redhat.com)
+
 * Fri Jan 31 2014 Raymond Mancy <rmancy@redhat.com> 4.58-1
 - Use legacy package names, add Provides for new package names.
   (rmancy@redhat.com)
