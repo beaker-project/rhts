@@ -197,7 +197,8 @@ fi
 
 %changelog
 * Thu Feb 13 2014 Nick Coghlan <ncoghlan@redhat.com> 4.59-1
-- Add 'arm', 'armhfp' & 'aarch64' to the list of allowed archs. (asaha@redhat.com)
+- Add 'arm', 'armhfp' & 'aarch64' to the list of allowed archs.
+  (asaha@redhat.com)
 
 * Fri Jan 31 2014 Raymond Mancy <rmancy@redhat.com> 4.58-1
 - Use legacy package names, add Provides for new package names.
