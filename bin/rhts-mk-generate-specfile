@@ -59,11 +59,11 @@ def generate_specfile(testinfos, name, version, release, strictRequires, strictA
     extra_provides = provides
     for test in testinfos:
         print "# Provides/Requires for test '%s'"%test.test_name
-        print "Provides: test(%s)" % test.test_name
+        print "Provides: test(%s) = %s-%s" % (test.test_name, version, release)
         for provides in test.provides + extra_provides:
             # RPM Dependency tokens must begin with alpha-numeric, '_' or '/':
             if re.match('^[A-Za-z0-9_/].*$', provides):
-                print "Provides: %s" % provides
+                print "Provides: %s = %s-%s" % (provides, version, release)
             else:
                 print "# testinfo requirement not usable in specfile: Provides: %s"%requires
         for requires in test.rhtsrequires:
@@ -82,7 +82,7 @@ def generate_specfile(testinfos, name, version, release, strictRequires, strictA
             else:
                 print "# requirement generation disabled; not adding Requires: %s"%requires
         for runfor in test.runfor:
-            print "Provides: test-of(%s)-%s"%(runfor, test.test_name)
+            print "Provides: test-of(%s)-%s = %s-%s" % (runfor, test.test_name, version, release)
             print "# from RunFor: %s"%runfor
             # so that you can "yum install test-of(somepackage)\*" and it will pull
             # in all tests
