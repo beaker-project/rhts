@@ -46,6 +46,8 @@ if [ -z "$AVC_ERROR" ]; then
     export AVC_ERROR=`mktemp /mnt/testarea/tmp.XXXXXX`
     touch $AVC_ERROR
 fi
+# backup, in case user overrides AVC_ERROR variable for single result
+export AVC_ERROR_FILE="$AVC_ERROR"
 
 touch $OUTPUTFILE
 

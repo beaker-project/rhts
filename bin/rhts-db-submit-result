@@ -705,6 +705,14 @@ def main():
             if log:
                 report_log('avc_log', recipetestid, the_result_id, log, logfile, testname)
                 print "   AvcLog: %s" % (logfile)
+    else:
+        # touch AVC error file, so that subsequent results dont report previously ignored AVCs
+        error_file = os.environ.get('AVC_ERROR_FILE')
+        if error_file and os.path.exists(error_file):
+            print "   Touch AvcLog: %s" % (error_file)
+            # sleep for 1 sec so avc denied messages will have differentiable time stamps
+            time.sleep(1)
+            os.utime(error_file, None)
 
 if __name__ == '__main__':
     main()
