@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.59
+Version: 4.60
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,11 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Wed Mar 12 2014 Dan Callaghan <dcallagh@redhat.com> 4.60-1
+- do not report suppressed AVCs in subsequent result (jstancek@redhat.com)
+- 'make rpm' should create the temp dir in /tmp (asaha@redhat.com)
+- add version to test() and test-of() virtual Provides (dcallagh@redhat.com)
+
 * Thu Feb 13 2014 Nick Coghlan <ncoghlan@redhat.com> 4.59-1
 - Add 'arm', 'armhfp' & 'aarch64' to the list of allowed archs.
   (asaha@redhat.com)
