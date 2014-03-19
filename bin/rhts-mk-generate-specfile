@@ -130,7 +130,7 @@ def generate_specfile(testinfos, name, version, release, strictRequires, strictA
     print 
     print 
     print "%files"
-    print "%defattr(-,root,root)"
+    print "%defattr(-,root,root,0755)"
     print "/mnt/tests"
     print 
     print "%changelog"
