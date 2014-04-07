@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.60
+Version: 4.61
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,9 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Mon Apr 07 2014 Dan Callaghan <dcallagh@redhat.com> 4.61-1
+- ensure directories always have mode 0755 in task RPMs (dcallagh@redhat.com)
+
 * Wed Mar 12 2014 Dan Callaghan <dcallagh@redhat.com> 4.60-1
 - do not report suppressed AVCs in subsequent result (jstancek@redhat.com)
 - 'make rpm' should create the temp dir in /tmp (asaha@redhat.com)
