@@ -203,6 +203,14 @@ def msg_rotate():
     if debug:
         print "Rotating the /var/log/messages file"
 
+def selinuxenabled():
+    try:
+        import selinux
+        return selinux.is_selinux_enabled()
+    except ImportError:
+        # It's possible to have SELinux enabled without libselinux-python installed...
+        (ret_val, data) = commands.getstatusoutput('selinuxenabled')
+        return (ret_val == 0)
 
 class Result(object):
 
@@ -677,7 +685,7 @@ def main():
         error_file="+no_file"
     
     #Report AVC Result
-    if error_file != "+no_avc_check":
+    if error_file != "+no_avc_check" and selinuxenabled():
        
         #Check for AVC's
         (result, logfile, dmesgfile)=avc_check(error_file, dmesgfile)
@@ -705,7 +713,7 @@ def main():
             if log:
                 report_log('avc_log', recipetestid, the_result_id, log, logfile, testname)
                 print "   AvcLog: %s" % (logfile)
-    else:
+    elif error_file == "+no_avc_check":
         # touch AVC error file, so that subsequent results dont report previously ignored AVCs
         error_file = os.environ.get('AVC_ERROR_FILE')
         if error_file and os.path.exists(error_file):
