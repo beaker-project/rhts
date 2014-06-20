@@ -42,10 +42,11 @@ if efibootmgr &>/dev/null ; then
     fi
 fi
 
+beahsh rebooting "Rebooting from task"
 /sbin/shutdown -r now
 
 # Wait for the shutdown to kill us..  we don't want control to go back
 #  to the test harness.
-while (true); do
+while true; do
     sleep 666
 done
