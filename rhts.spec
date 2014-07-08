@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.61
+Version: 4.62
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,9 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Tue Jul 08 2014 Amit Saha <asaha@redhat.com> 4.62-1
+- rhts-reboot generates a "rebooting" event before the system reboots (asaha@redhat.com)
+
 * Mon Apr 07 2014 Dan Callaghan <dcallagh@redhat.com> 4.61-1
 - ensure directories always have mode 0755 in task RPMs (dcallagh@redhat.com)
 
