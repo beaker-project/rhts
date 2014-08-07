@@ -124,7 +124,11 @@ GENERATED_SPECFILE=$GENERATED_SOURCE_DIR/$RHTS_RPM_NAME-$VERSION-$RELEASE.spec
 TARBALL=$GENERATED_SOURCE_DIR/$RHTS_RPM_NAME-$VERSION-$RELEASE.tar.gz
 
 echo "Creating tarball: $TARBALL"
-tar --exclude "CVS" --exclude ".svn" --exclude ".git" --exclude "rhts-.\*\.rpm" -zcvf $TARBALL --directory $SOURCE_DIR . || exit 1
+if git log -1 &>/dev/null ; then
+    git archive --format=tar $CURRENT_TAG | gzip >$TARBALL || exit 1
+else
+    tar --exclude "CVS" --exclude ".svn" --exclude ".git" --exclude "rhts-.\*\.rpm" -zcvf $TARBALL --directory $SOURCE_DIR . || exit 1
+fi
 
 echo "Gathering testinfo.desc files:"
 # Extract tarball to a clean location and run "make testinfo.desc" in each location:
