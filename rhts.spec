@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.62
+Version: 4.63
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,10 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Mon Aug 18 2014 Amit Saha <asaha@redhat.com> 4.63-1
+- Add ppc64le to the list of valid archs (asaha@redhat.com)
+- Script for moving packages from *-candidate to * tags (asaha@redhat.com)
+
 * Tue Jul 08 2014 Amit Saha <asaha@redhat.com> 4.62-1
 - rhts-reboot generates a "rebooting" event before the system reboots (asaha@redhat.com)
 
