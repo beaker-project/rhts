@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.63
+Version: 4.64
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,11 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Wed Aug 27 2014 Dan Callaghan <dcallagh@redhat.com> 4.64-1
+- use git-archive to produce a pristine tarball when building task RPMs
+  (dcallagh@redhat.com)
+- skip AVC checking if SELinux is disabled (dcallagh@redhat.com)
+
 * Mon Aug 18 2014 Amit Saha <asaha@redhat.com> 4.63-1
 - Add ppc64le to the list of valid archs (asaha@redhat.com)
 - Script for moving packages from *-candidate to * tags (asaha@redhat.com)
