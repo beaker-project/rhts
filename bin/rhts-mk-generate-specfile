@@ -65,7 +65,7 @@ def generate_specfile(testinfos, name, version, release, strictRequires, strictA
             if re.match('^[A-Za-z0-9_/].*$', provides):
                 print "Provides: %s = %s-%s" % (provides, version, release)
             else:
-                print "# testinfo requirement not usable in specfile: Provides: %s"%requires
+                print "# testinfo requirement not usable in specfile: Provides: %s" % provides
         for requires in test.rhtsrequires:
             # RPM Dependency tokens must begin with alpha-numeric, '_' or '/':
             if re.match('^[A-Za-z0-9_/].*$', requires):
