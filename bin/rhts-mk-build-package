@@ -79,6 +79,16 @@ echo "               VERSION: $VERSION"
 echo "               RELEASE: $RELEASE"
 echo "            SOURCE_DIR: $SOURCE_DIR"
 
+# if we are in git, we need a tag
+if git log -1 &>/dev/null ; then
+    if [[ -z "$CURRENT_TAG" ]] ; then
+        echo "Error: no tags found" >&2
+        echo "(Hint: make tag)" >&2
+        echo "(Hint: to skip version control, move this task outside your git tree)" >&2
+        exit 1
+    fi
+fi
+
 # TMP_DIR: do everything for this run under a unique temp directory
 TMP_DIR=`mktemp -d /tmp/rhts-build-XXXXXXXX` || exit 1
 echo "               TMP_DIR: $TMP_DIR"
