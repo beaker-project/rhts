@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.64
+Version: 4.65
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,9 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Thu Oct 16 2014 Dan Callaghan <dcallagh@redhat.com> 4.65-1
+- error out if task is in git but no tag is found (dcallagh@redhat.com)
+
 * Wed Aug 27 2014 Dan Callaghan <dcallagh@redhat.com> 4.64-1
 - use git-archive to produce a pristine tarball when building task RPMs
   (dcallagh@redhat.com)
