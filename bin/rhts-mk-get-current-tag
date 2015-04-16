@@ -39,7 +39,7 @@ if [ -d "CVS" ]; then
 fi
 
 # for svn, just use the svn repo revision number for the package revision number
-if [ -d ".svn" ]; then
+if svn info &> /dev/null; then
 	CURRENT_REVISION=`svn info | fgrep "Revision:" | awk '{print $2}'`
 	CURRENT_TAG="$PACKAGE_NAME-$CURRENT_VERSION-$CURRENT_REVISION"
 fi

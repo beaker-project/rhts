@@ -34,7 +34,7 @@ if [ -d "CVS" ]; then
     cvs diff -r $CURRENT_TAG
 fi
 
-if [ -d ".svn" ]; then
+if svn info &> /dev/null; then
     echo "SVN not supported yet!"
     exit 1
 fi
