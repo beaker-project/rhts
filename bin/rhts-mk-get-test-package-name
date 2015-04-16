@@ -45,7 +45,7 @@ if [ -d $SOURCE_DIR/CVS ]; then
 	PACKAGE_NAME="$REPO_NAME-$REPO_PATH"
 fi
 
-if [ -d "$SOURCE_DIR/.svn" ]; then
+if svn info &> /dev/null; then
 	REPO_ROOT=`svn info $SOURCE_DIR | fgrep "Repository Root:" | awk '{print $3}'`
 	REPO_NAME=`echo $REPO_ROOT | sed -e "s'svn+ssh://[^@]*@''" | sed -e "s/http[s]\?:\/\///" | sed -e "s/[\.\/]/-/g"`
 	PACKAGE_NAME=`svn info $SOURCE_DIR  |  fgrep "URL:" | awk '{print $2}' | sed -e "s'svn+ssh://[^@]*@''" | sed -e "s/http[s]\?:\/\///" | sed -e "s/[\.\/]/-/g"`
