@@ -55,13 +55,13 @@ def sync_block(states,machines,any_machine,timeout):
     result_server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % result_server
 
     if not result_server:
-       raise Exception, "You must sepcify the result server with the -R switch"
+       raise Exception, "You must specify the result server with the -R switch"
 
     if not recipesetid:
-       raise Exception, "You must sepcify the recipesetid with the -r switch"
+       raise Exception, "You must specify the recipesetid with the -r switch"
 
     if not testorder:
-       raise Exception, "You must sepcify the testorder with the -t switch"
+       raise Exception, "You must specify the testorder with the -t switch"
 
     client = xmlrpclib.Server(result_server)
     curr_states = []
@@ -138,7 +138,7 @@ def main():
         return -1
 
     if not states:
-       raise Exception, "You must sepcify a state with the -s switch"
+       raise Exception, "You must specify a state with the -s switch"
 
     if not result_server:
         sys.stderr.write("result_server not set, assuming developer mode.\n")

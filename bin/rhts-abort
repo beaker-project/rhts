@@ -107,7 +107,7 @@ def main():
             recipeid = val
 
     if not type:
-        print "You must sepcify a type with the -t flag"
+        print "You must specify a type with the -t flag"
         sys.exit(1)
 
     if not result_server:

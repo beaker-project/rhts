@@ -73,7 +73,7 @@ def main():
             assert start >= 0, "start must be greater or equall zero."
 
     if not logname:
-        print "You must sepcify a logfile with the -l switch"
+        print "You must specify a logfile with the -l switch"
         sys.exit(1)
 
     if not result_server:
@@ -82,7 +82,7 @@ def main():
         sys.exit(0)
     else:
         if not recipetestid:
-           print "You must sepcify a recipetestid with the -T switch"
+           print "You must specify a recipetestid with the -T switch"
            sys.exit(1)
         report_log(recipetestid, logname, start=start)
 

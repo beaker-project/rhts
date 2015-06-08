@@ -41,19 +41,19 @@ def sync_set(state):
     result_server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % result_server
 
     if not result_server:
-       print "You must sepcify the result server with the -R switch"
+       print "You must specify the result server with the -R switch"
        sys.exit(1)
 
     if not hostname:
-       print "You must sepcify the hostname with the -m switch"
+       print "You must specify the hostname with the -m switch"
        sys.exit(1)
 
     if not recipesetid:
-       print "You must sepcify the recipesetid with the -r switch"
+       print "You must specify the recipesetid with the -r switch"
        sys.exit(1)
 
     if not testorder:
-       print "You must sepcify the testorder with the -t switch"
+       print "You must specify the testorder with the -t switch"
        sys.exit(1)
     client = xmlrpclib.Server(result_server)
     while True:
@@ -105,7 +105,7 @@ def main():
             testorder = val
 
     if not state:
-        print "You must sepcify a state with the -s switch"
+        print "You must specify a state with the -s switch"
         sys.exit(1)
 
     if not result_server:
