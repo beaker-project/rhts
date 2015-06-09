@@ -35,6 +35,7 @@ EOF
 }
 
 SOURCE_DIR=`pwd`
+UPLOAD_TO_BEAKER=""
 ABI_OPTIONS=""
 
 while getopts "d:s:bah" opt; do
@@ -42,7 +43,7 @@ while getopts "d:s:bah" opt; do
 
    d )  SOURCE_DIR=$OPTARG ;;
    s )  TESTSERVER=$OPTARG ;;
-   b )  BEAKER="BEAKER" ;;
+   b )  UPLOAD_TO_BEAKER=1 ;;
    a )  ABI_OPTIONS="--strict-abi" ;;
    h )  echo "found $opt" ; usage ;;
    \?)  usage ;;
@@ -162,7 +163,7 @@ if [ -n "$TESTSERVER" ]; then
         rhts-mk-test-import $TESTSERVER $RPM $VERSION-$RELEASE || exit 1
     done
     popd
-elif [ -n "$BEAKER" ]; then
+elif [ -n "$UPLOAD_TO_BEAKER" ]; then
     pushd $INSTALL_DIR
     for RPM in $(find . -name \*.rpm); do
         bkr task-add $RPM || exit 1
