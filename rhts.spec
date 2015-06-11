@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.65
+Version: 4.66
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,14 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Thu Jun 11 2015 Dan Callaghan <dcallagh@redhat.com> 4.66-1
+- Don't warn on unknown fields (bpeck@redhat.com)
+- Fixed getting current tag and diff with svn 1.7 (dmitry.yudakov@gmail.com)
+- Fixed getting test package name with svn 1.7 (dmitry.yudakov@gmail.com)
+- BEAKER shell variable collides with env var in task environment
+  (dcallagh@redhat.com)
+- s/sepcify/specify/ (jpokorny@redhat.com)
+
 * Thu Oct 16 2014 Dan Callaghan <dcallagh@redhat.com> 4.65-1
 - error out if task is in git but no tag is found (dcallagh@redhat.com)
 
