@@ -24,6 +24,7 @@ import sys, getopt
 #import xmlrpclib
 import rhts.timeout_xmlrpclib as xmlrpclib
 
+import syslog
 import string
 import os
 import pprint
@@ -50,6 +51,10 @@ def isset(x):
     else:
        return 0
 
+def info(msg):
+    syslog.syslog(msg)
+    sys.stderr.write(msg + '\n')
+
 def sync_block(states,machines,any_machine,timeout):
     global result_server, hostname, recipesetid, testorder
     result_server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % result_server
@@ -65,7 +70,6 @@ def sync_block(states,machines,any_machine,timeout):
 
     client = xmlrpclib.Server(result_server)
     curr_states = []
-    CONSOLE = open("/dev/console", "w")
     while True:
         if any_machine:
             for machine in machines:
@@ -74,7 +78,7 @@ def sync_block(states,machines,any_machine,timeout):
                 except xmlrpclib.Fault, e:
                     pass # assuming it's just a timeout
                 except Exception, e:
-                    CONSOLE.write('rhts-sync-block: %s\n' % e)
+                    info('rhts-sync-block: %s' % e)
                 if curr_states:
                     break
         else:
@@ -83,14 +87,13 @@ def sync_block(states,machines,any_machine,timeout):
             except xmlrpclib.Fault, e:
                 pass # assuming it's just a timeout
             except Exception, e:
-                CONSOLE.write('rhts-sync-block: %s\n' % e)
+                info('rhts-sync-block: %s' % e)
         if curr_states:
             break
         if timeout and datetime.datetime.now() > timeout:
-            CONSOLE.write('rhts-sync-block --timeout exceeded\n')
+            info('rhts-sync-block --timeout exceeded')
             return 1
         time.sleep(5)
-    CONSOLE.close()
     print string.join(curr_states,":")
     return 0
 

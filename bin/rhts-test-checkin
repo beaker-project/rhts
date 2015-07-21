@@ -51,10 +51,8 @@ while True:
         time.sleep(5)
 
 # syslog the message
-syslog.syslog("JobID:%s Test:%s" % (jobid, test))
-# send it to the console as well
-fd = os.open("/dev/console", os.O_WRONLY)
-res = os.write(fd, "%s JobID:%s Test:%s Response:%s\n" % (timetext, jobid, test, resp))
-res = os.close(fd)
+syslog.syslog("JobID:%s Test:%s Response:%s" % (jobid, test, resp))
+# send it to stderr as well
+sys.stderr.write("%s JobID:%s Test:%s Response:%s\n" % (timetext, jobid, test, resp))
 if resp != 1:
     sys.exit(1)

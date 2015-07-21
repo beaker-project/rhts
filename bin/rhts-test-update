@@ -32,8 +32,5 @@ while True:
 
 # syslog the message
 syslog.syslog("%s testID:%s %s:\n" % (timetext, test_id, call_type))
-# send it to the console as well
-fd = os.open("/dev/console", os.O_WRONLY)
-res = os.write(fd, "%s testID:%s %s:\n" % (timetext, test_id, call_type))
-res = os.close(fd)
-
+# send it to stderr as well
+sys.stderr.write("%s testID:%s %s:\n" % (timetext, test_id, call_type))
