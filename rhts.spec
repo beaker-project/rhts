@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.66
+Version: 4.67
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,9 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Wed Aug 26 2015 Dan Callaghan <dcallagh@redhat.com> 4.67-1
+- avoid writing to /dev/console directly (dcallagh@redhat.com)
+
 * Thu Jun 11 2015 Dan Callaghan <dcallagh@redhat.com> 4.66-1
 - Don't warn on unknown fields (bpeck@redhat.com)
 - Fixed getting current tag and diff with svn 1.7 (dmitry.yudakov@gmail.com)
