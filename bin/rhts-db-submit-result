@@ -483,10 +483,10 @@ def check_for_errors(dmesg_data, failure_strings=None, false_strings=None):
 
     failure_patterns = []
     for x in failure_strings:
-        failure_patterns.append(re.compile(x.rstrip('\n')))
+        failure_patterns.append(re.compile(x.rstrip('\n'), re.DOTALL))
     false_patterns = []
     for x in false_strings:
-        false_patterns.append(re.compile(x.rstrip('\n')))
+        false_patterns.append(re.compile(x.rstrip('\n'), re.DOTALL))
 
     def match(patterns, line):
         for p in patterns:
@@ -495,20 +495,22 @@ def check_for_errors(dmesg_data, failure_strings=None, false_strings=None):
         return False
 
     data = []
-    reading_trace = False
-    for line in dmesg_data:
-        line = line.rstrip('\n')
-        if not reading_trace:
-            if match(failure_patterns, line) and \
-               not match(false_patterns, line):
+    it = iter(dmesg_data)
+    try:
+        while True:
+            line = it.next().rstrip('\n')
+            if '[ cut here ]' in line:
+                trace = [line]
+                while 'end trace' not in trace[-1]:
+                    trace.append(it.next())
+                if not match(false_patterns, '\n'.join(trace)):
+                    data.extend(trace)
+            elif match(failure_patterns, line) and \
+                   not match(false_patterns, line):
                 data.append(line)
-                if '[ cut here ]' in line:
-                    reading_trace = True
-        else:
-            # we are reading a trace
-            data.append(line)
-            if 'end trace' in line:
-                reading_trace = False
+    except StopIteration:
+        pass
+
     if data:
         result = 'FAIL'
         errors = ['Checking dmesg for specific failures!']
@@ -547,7 +549,24 @@ def test_check_for_errors():
                     'Badness at',
                     'blah bloop',
                     'NMI appears to be stuck',
-                    'blip blop']
+                    'blip blop',
+                    '------------[ cut here ]------------', # this one is ignored due to falsestrings
+                    'WARNING: at arch/x86/mm/ioremap.c:195 __ioremap_caller+0x286/0x370()',
+                    'Info: mapping multiple BARs. Your kernel is fine.',
+                    'Hardware name: IBM IBM System X3250 M4 -[2583AC1]-/00D3729, BIOS -[JQE164AUS-1.07]- 12/09/2013',
+                    ' ffff88023241ba88 00000000653d7f8a ffff88023241ba40 ffffffff816350c1',
+                    ' ffff88023241ba78 ffffffff8107b200 ffffc90004e50000 ffffc90004e50000',
+                    ' 00000000fed18000 ffffc90004e50000 0000000000008000 ffff88023241bae0',
+                    'Call Trace:',
+                    ' [<ffffffff816350c1>] dump_stack+0x19/0x1b',
+                    ' [<ffffffff8107b200>] warn_slowpath_common+0x70/0xb0',
+                    ' [<ffffffff810ed4ae>] load_module+0x134e/0x1b50',
+                    ' [<ffffffff813166b0>] ? ddebug_proc_write+0xf0/0xf0',
+                    ' [<ffffffff810e9743>] ? copy_module_from_fd.isra.42+0x53/0x150',
+                    ' [<ffffffff810ede66>] SyS_finit_module+0xa6/0xd0',
+                    ' [<ffffffff816457c9>] system_call_fastpath+0x16/0x1b',
+                    '---[ end trace 5fcf161d6e45465f ]---',
+    ]
 
     failure_strings = ['Oops',
                        'BUG',
@@ -556,7 +575,9 @@ def test_check_for_errors():
                        'Badness at']
 
     false_strings = ['BIOS BUG',
-                     'DEBUG']
+                     'DEBUG',
+                     'mapping multiple BARs.*IBM System X3250 M4 ',
+    ]
 
     expected_dmesg_log = '''Checking dmesg for specific failures!
 ------------[ cut here ]------------
