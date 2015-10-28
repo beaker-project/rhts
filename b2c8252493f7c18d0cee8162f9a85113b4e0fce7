@@ -1,0 +1,9 @@
+Ready-for-Checks+1: Dan Callaghan <dcallagh@redhat.com>
+Code-Review+1: Roman Joost <rjoost@redhat.com>
+Code-Review+2: Matt Jia <mjia@redhat.com>
+Verified+1: Dan Callaghan <dcallagh@redhat.com>
+Submitted-by: Dan Callaghan <dcallagh@redhat.com>
+Submitted-at: Wed, 28 Oct 2015 05:49:41 +0000
+Reviewed-on: http://gerrit.beaker-project.org/4457
+Project: rhts
+Branch: refs/heads/master
