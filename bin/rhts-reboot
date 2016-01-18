@@ -17,7 +17,7 @@
 
 PATH=/sbin:/usr/sbin:$PATH
 
-if [ "$RESULT_SERVER+is_not_set" = "+is_not_set" ]; then 
+if [ -n "$RESULT_SERVER" ] ; then
 	echo "RHTS test $TEST wants to reboot your system"
 	echo -n "Press Enter to reboot or hit CTRL-C to stop"
 	read Dummy
@@ -42,7 +42,9 @@ if efibootmgr &>/dev/null ; then
     fi
 fi
 
-beahsh rebooting "Rebooting from task"
+if [ -n "$RESULT_SERVER" ] ; then
+    beahsh rebooting "Rebooting from task"
+fi
 /sbin/shutdown -r now
 
 # Wait for the shutdown to kill us..  we don't want control to go back
