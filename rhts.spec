@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.68
+Version: 4.69
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,11 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Tue Mar 08 2016 Dan Callaghan <dcallagh@redhat.com> 4.69-1
+- remove all chunk hashing code in uploadWrapper (dcallagh@redhat.com)
+- rhts-reboot: don't invoke beahsh if we are not run inside a task
+  (dcallagh@redhat.com)
+
 * Mon Nov 23 2015 Matt Jia <mjia@redhat.com> 4.68-1
 - ignore "mapping multiple BARs" warning on IBM x3250m4 models
   (dcallagh@redhat.com)
