@@ -17,7 +17,7 @@
 
 PATH=/sbin:/usr/sbin:$PATH
 
-if [ -n "$RESULT_SERVER" ] ; then
+if [ -z "$RESULT_SERVER" ] ; then
 	echo "RHTS test $TEST wants to reboot your system"
 	echo -n "Press Enter to reboot or hit CTRL-C to stop"
 	read Dummy
