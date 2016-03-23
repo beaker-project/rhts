@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.69
+Version: 4.70
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -196,6 +196,10 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Wed Mar 23 2016 Dan Callaghan <dcallagh@redhat.com> 4.70-1
+- rhts-reboot: fix backwards logic when prompting for reboot
+  (dcallagh@redhat.com)
+
 * Tue Mar 08 2016 Dan Callaghan <dcallagh@redhat.com> 4.69-1
 - remove all chunk hashing code in uploadWrapper (dcallagh@redhat.com)
 - rhts-reboot: don't invoke beahsh if we are not run inside a task
