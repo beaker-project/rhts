@@ -502,7 +502,7 @@ def check_for_errors(dmesg_data, failure_strings=None, false_strings=None):
             if '[ cut here ]' in line:
                 trace = [line]
                 while 'end trace' not in trace[-1]:
-                    trace.append(it.next())
+                    trace.append(it.next().rstrip('\n'))
                 if not match(false_patterns, '\n'.join(trace)):
                     data.extend(trace)
             elif match(failure_patterns, line) and \
