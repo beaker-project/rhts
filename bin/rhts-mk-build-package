@@ -37,6 +37,7 @@ EOF
 SOURCE_DIR=`pwd`
 UPLOAD_TO_BEAKER=""
 ABI_OPTIONS=""
+URL_OPTIONS=""
 
 while getopts "d:s:bah" opt; do
    case $opt in
@@ -74,10 +75,16 @@ fi
 
 VERSION=`rhts-mk-get-version-info -v $CURRENT_TAG`
 RELEASE=`rhts-mk-get-version-info -r $CURRENT_TAG`
+URL=`rhts-mk-get-test-package-url`
+if [ -n "$URL" ] ; then
+    URL_OPTIONS="--url $URL"
+fi
+
 echo "           CURRENT_TAG: $CURRENT_TAG"
 echo "                  NAME: $RHTS_RPM_NAME"
 echo "               VERSION: $VERSION"
 echo "               RELEASE: $RELEASE"
+echo "                   URL: $URL"
 echo "            SOURCE_DIR: $SOURCE_DIR"
 
 # if we are in git, we need a tag
@@ -152,7 +159,7 @@ make testinfo.desc || exit $?
 popd
 
 echo "Generating specfile: $GENERATED_SPECFILE"
-find $EXTRACT_DIR -name testinfo.desc | rhts-mk-generate-specfile $ABI_OPTIONS $RHTS_RPM_NAME $VERSION $RELEASE $provides  > $GENERATED_SPECFILE || exit $?
+find $EXTRACT_DIR -name testinfo.desc | rhts-mk-generate-specfile $ABI_OPTIONS $URL_OPTIONS $RHTS_RPM_NAME $VERSION $RELEASE $provides  > $GENERATED_SPECFILE || exit $?
 echo "Building package:"
 rpmbuild  -bb --define "_builddir $BUILD_DIR" --define "_sourcedir $GENERATED_SOURCE_DIR"  --define "_rpmdir $INSTALL_DIR" $GENERATED_SPECFILE || exit 1
 

@@ -184,6 +184,7 @@ fi
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-get-current-tag
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-get-next-tag
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-get-test-package-name
+%attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-get-test-package-url
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-get-version-info
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-tag-release
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-test-import

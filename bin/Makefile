@@ -11,7 +11,8 @@ PUBLIC_PYTHON_SCRIPTS := rhts-lint rhts-abort rhts-db-submit-result \
 PRIVATE_SHELL_SCRIPTS :=  rhts-mk-build-package \
          rhts-mk-get-current-tag rhts-mk-get-next-tag \
          rhts-mk-get-test-package-name rhts-mk-get-version-info \
-         rhts-mk-tag-release rhts-mk-snake-template rhts-mk-diff-since-last-tag
+         rhts-mk-tag-release rhts-mk-snake-template rhts-mk-diff-since-last-tag \
+         rhts-mk-get-test-package-url
 PRIVATE_PYTHON_SCRIPTS := rhts-mk-test-import rhts-mk-generate-specfile
 
 PUBLIC_FILES := $(PUBLIC_SHELL_SCRIPTS) $(PUBLIC_PYTHON_SCRIPTS)
