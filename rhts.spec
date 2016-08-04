@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.70
+Version: 4.71
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -197,6 +197,11 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Thu Aug 04 2016 Dan Callaghan <dcallagh@redhat.com> 4.71-1
+- populate task RPM's URL field with SCM URL (dcallagh@redhat.com)
+- fix extra newlines in 'cut here' dmesg check output (dcallagh@redhat.com)
+- falsestrings: match x3250 as well as X3250 (dcallagh@redhat.com)
+
 * Wed Mar 23 2016 Dan Callaghan <dcallagh@redhat.com> 4.70-1
 - rhts-reboot: fix backwards logic when prompting for reboot
   (dcallagh@redhat.com)
