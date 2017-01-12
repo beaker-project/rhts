@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.71
+Version: 4.72
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -197,6 +197,9 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Thu Jan 12 2017 Dan Callaghan <dcallagh@redhat.com> 4.72-1
+- support Skip result (dcallagh@redhat.com)
+
 * Thu Aug 04 2016 Dan Callaghan <dcallagh@redhat.com> 4.71-1
 - populate task RPM's URL field with SCM URL (dcallagh@redhat.com)
 - fix extra newlines in 'cut here' dmesg check output (dcallagh@redhat.com)
