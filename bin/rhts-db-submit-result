@@ -642,7 +642,11 @@ def main():
             recipetestid = val
         if opt in ('-D', '--dmesg'):
             dmesgfile = val
-            dmesg = read_file(dmesgfile)
+            try:
+                dmesg = read_file(dmesgfile)
+            except (IOError, OSError), e:
+                sys.stderr.write('Error reading dmesg file %s: %s\n' % (dmesgfile, e))
+                sys.exit(1)
         if opt in ('-l', '--log'):
             logfile = val
             if logfile == "-":
@@ -652,7 +656,11 @@ def main():
                 LF.write(log)
                 LF.close( )
             else:
-                log = read_file(logfile)
+                try:
+                    log = read_file(logfile)
+                except (IOError, OSError), e:
+                    sys.stderr.write('Error reading log file %s: %s\n' % (logfile, e))
+                    sys.exit(1)
         if opt in ('-t', '--testname'):
             testname = val
         if opt in ('-r', '--result'):

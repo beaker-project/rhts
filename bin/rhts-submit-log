@@ -84,7 +84,11 @@ def main():
         if not recipetestid:
            print "You must specify a recipetestid with the -T switch"
            sys.exit(1)
-        report_log(recipetestid, logname, start=start)
+        try:
+            report_log(recipetestid, logname, start=start)
+        except (IOError, OSError), e:
+            sys.stderr.write('Error reading log file %s: %s\n' % (logname, e))
+            sys.exit(1)
 
 
 if __name__ == '__main__':
