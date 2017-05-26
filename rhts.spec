@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.72
+Version: 4.73
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -197,6 +197,10 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Fri May 26 2017 Dan Callaghan <dcallagh@redhat.com> 4.73-1
+- exit with an error when non-existent log files are given
+  (dcallagh@redhat.com)
+
 * Thu Jan 12 2017 Dan Callaghan <dcallagh@redhat.com> 4.72-1
 - support Skip result (dcallagh@redhat.com)
 
