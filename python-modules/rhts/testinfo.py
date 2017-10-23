@@ -148,11 +148,19 @@ class RegexValidator(Validator):
     def message(self):
         return self.msg
 
+class UnicodeRegexValidator(RegexValidator):
+    """
+    Validates against a regexp pattern but with the re.UNICODE flag applied
+    so that character classes like \w have their "Unicode-aware" meaning.
+    """
+    def is_valid(self, value):
+        return re.match(self.pattern, value, re.UNICODE)
+
 # This is specified in RFC2822 Section 3.4, 
 # we accept only the most common variations
-class NameAddrValidator(RegexValidator):
+class NameAddrValidator(UnicodeRegexValidator):
 
-    ATOM_CHARS = r"\w!#$%&'*+-/=?^_`{|}~"
+    ATOM_CHARS = r"\w!#$%&'\*\+-/=?^_`{|}~"
     PHRASE = r' *[%s][%s ]*' % (ATOM_CHARS, ATOM_CHARS)
     ADDR_SPEC = r'[%s.]+@[%s.]+' % (ATOM_CHARS, ATOM_CHARS)
     NAME_ADDR = r'%s<%s> *' % (PHRASE, ADDR_SPEC)
@@ -894,6 +902,12 @@ class OwnerFieldTests(unittest.TestCase):
         parser = StrictParser(raise_errors=True)
         parser.handle_owner('Owner', u'Endre Balint-Nagy <endre@redhat.com>')
         self.assertEquals(parser.info.owner, u'Endre Balint-Nagy <endre@redhat.com>')
+
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1491658
+    def test_non_ascii_owner(self):
+        parser = StrictParser(raise_errors=True)
+        parser.handle_owner('Owner', u'Gęśla Jaźń <gj@example.com>')
+        self.assertEquals(parser.info.owner, u'Gęśla Jaźń <gj@example.com>')
 
 class PriorityFieldTests(unittest.TestCase):
     def test_priority(self):
