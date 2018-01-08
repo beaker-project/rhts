@@ -21,8 +21,15 @@ Tool to generate a specfile, based on a list of testinfo.desc filenames
 import sys
 import re
 import os
+import codecs
 
 import rhts.testinfo
+
+# Ordinarily we would want to respect the locale encoding and all that jazz,
+# when we write unicode to stdout. But this script is specifically designed for
+# piping stdout to a file to produce the .spec, which is always UTF-8 encoded.
+# So let's just hack it:
+sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
 def get_tarball_name(name, version, release):
     return "%s-%s-%s.tar.gz"%(name, version, release)
@@ -166,7 +173,7 @@ def test():
 
 def parse_file(filename):
     p = rhts.testinfo.StderrParser(filename)
-    p.parse(open(filename).readlines())
+    p.parse(codecs.open(filename, 'r', 'utf8').readlines())
     if p.numErrors>0:
         sys.exit(1)
     return p.info

@@ -38,7 +38,7 @@ class __DeferredFileInputFilenameString:
         return fileinput.filename()
         
 if __name__=='__main__':
-    input = fileinput.input()
+    input = fileinput.input(openhook=fileinput.hook_encoded('utf8'))
     p = rhts.testinfo.StdoutParser(__DeferredFileInputFilenameString())
     p.parse(input)
     if p.numErrors or p.numWarnings:
