@@ -3,7 +3,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.73
+Version: 4.74
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -197,6 +197,12 @@ fi
 %{python_sitelib}/%{name}*
 
 %changelog
+* Wed Feb 07 2018 Dan Callaghan <dcallagh@redhat.com> 4.74-1
+- testinfo.py, rhts-lint, and rhts-mk-generate-specfile deal in unicode
+  not bytes (dcallagh@redhat.com)
+- accept - prefix on Architectures to indicate exclusion (dcallagh@redhat.com)
+- accept non-ASCII names in testinfo.desc (dcallagh@redhat.com)
+
 * Fri May 26 2017 Dan Callaghan <dcallagh@redhat.com> 4.73-1
 - exit with an error when non-existent log files are given
   (dcallagh@redhat.com)
