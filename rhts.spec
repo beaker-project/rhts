@@ -1,4 +1,5 @@
-%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+%{!?__python2: %global __python2 /usr/bin/python2}
+%{!?python2_sitelib: %global python2_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %{!?pyver: %global pyver %(%{__python} -c "import sys ; print sys.version[:3]")}
 
 Name: rhts
@@ -76,13 +77,13 @@ related programs.
 %build
 [ "$RPM_BUILD_ROOT" != "/" ] && [ -d $RPM_BUILD_ROOT ] && rm -rf $RPM_BUILD_ROOT;
 pushd python-modules
-CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
+CFLAGS="$RPM_OPT_FLAGS" %{__python2} setup.py build
 popd
 
 %install
 DESTDIR=$RPM_BUILD_ROOT make install
 pushd python-modules 
-%{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
+%{__python2} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
 popd
 
 %if 0%{?rhel}%{?fedora} > 4
@@ -194,7 +195,7 @@ fi
 
 %files python
 %defattr(-,root,root)
-%{python_sitelib}/%{name}*
+%{python2_sitelib}/%{name}*
 
 %changelog
 * Wed Feb 07 2018 Dan Callaghan <dcallagh@redhat.com> 4.74-1
