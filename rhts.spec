@@ -5,7 +5,7 @@
 Name: rhts
 Summary: Automated software testing
 Version: 4.74
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/Libraries
 License: GPLv2+
 Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
@@ -198,6 +198,9 @@ fi
 %{python2_sitelib}/%{name}*
 
 %changelog
+* Fri Aug 31 2018 Dan Callaghan <dcallagh@redhat.com> 4.74-2
+- invoke python2 explicitly (dcallagh@redhat.com)
+
 * Wed Feb 07 2018 Dan Callaghan <dcallagh@redhat.com> 4.74-1
 - testinfo.py, rhts-lint, and rhts-mk-generate-specfile deal in unicode
   not bytes (dcallagh@redhat.com)
