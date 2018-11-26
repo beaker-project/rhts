@@ -161,7 +161,7 @@ popd
 echo "Generating specfile: $GENERATED_SPECFILE"
 find $EXTRACT_DIR -name testinfo.desc | rhts-mk-generate-specfile $ABI_OPTIONS $URL_OPTIONS $RHTS_RPM_NAME $VERSION $RELEASE $provides  > $GENERATED_SPECFILE || exit $?
 echo "Building package:"
-rpmbuild  -bb --define "_builddir $BUILD_DIR" --define "_sourcedir $GENERATED_SOURCE_DIR"  --define "_rpmdir $INSTALL_DIR" $GENERATED_SPECFILE || exit 1
+rpmbuild  -bb --define "_binaries_in_noarch_packages_terminate_build 0" --define "_unpackaged_files_terminate_build 0" --define "_builddir $BUILD_DIR" --define "_sourcedir $GENERATED_SOURCE_DIR"  --define "_rpmdir $INSTALL_DIR" $GENERATED_SPECFILE || exit 1
 
 #bpeck: if $(TESTSERVER) passed in then submit rpm.
 if [ -n "$TESTSERVER" ]; then
