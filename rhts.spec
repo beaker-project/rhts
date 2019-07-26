@@ -4,7 +4,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.75
+Version: 4.76
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -198,6 +198,9 @@ fi
 %{python2_sitelib}/%{name}*
 
 %changelog
+* Fri Jul 26 2019 Martin Styk <mastyk@redhat.com> 4.76-1
+- 
+
 * Fri Jul 26 2019 Martin Styk <mastyk@redhat.com> 4.75-1
 - rhts-mk-build-package allows using binary data in rpm creation
   (mastyk@redhat.com)
