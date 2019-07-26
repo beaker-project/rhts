@@ -4,8 +4,8 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.74
-Release: 2%{?dist}
+Version: 4.75
+Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
 Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
@@ -198,6 +198,10 @@ fi
 %{python2_sitelib}/%{name}*
 
 %changelog
+* Fri Jul 26 2019 Martin Styk <mastyk@redhat.com> 4.75-1
+- rhts-mk-build-package allows using binary data in rpm creation
+  (mastyk@redhat.com)
+
 * Fri Aug 31 2018 Dan Callaghan <dcallagh@redhat.com> 4.74-2
 - invoke python2 explicitly (dcallagh@redhat.com)
 
