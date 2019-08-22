@@ -1,0 +1,5 @@
+.idea/
+# Python optimized files
+*.pyo
+*.pyc
+__pycache__
