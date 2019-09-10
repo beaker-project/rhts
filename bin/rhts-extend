@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/bin/sh
 #
 # Copyright (c) 2010 Red Hat, Inc.
 #
@@ -15,9 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see http://www.gnu.org/licenses/.
 
-import xmlrpclib
+
+# Check the correct Python executable to run this file.
+# Python3 will be preferred.
+""":"
+
+cmd=$(python-check.sh)
+
+exec -- $cmd $0 "$@";
+
+":"""
+from __future__ import print_function
+
+from six.moves import xmlrpc_client as xmlrpclib
 import sys
 
 server = xmlrpclib.ServerProxy("http://%s:8000" % sys.argv[1])
 
-print server.extend_watchdog(sys.argv[2], int(sys.argv[3])) 
+print(server.extend_watchdog(sys.argv[2], int(sys.argv[3])))

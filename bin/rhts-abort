@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/bin/sh
 #
 # Copyright (c) 2006 Red Hat, Inc.
 #
@@ -17,8 +17,20 @@
 #
 # Author: Bill Peck
 
+
+# Check the correct Python executable to run this file.
+# Python3 will be preferred.
+""":"
+
+cmd=$(python-check.sh)
+
+exec -- $cmd $0 "$@";
+
+":"""
+from __future__ import print_function
+
 import sys, getopt
-import xmlrpclib
+from six.moves import xmlrpc_client as xmlrpclib
 import string
 import os
 import pprint
@@ -41,7 +53,7 @@ def abortJob(server, jobid):
             resp = server.watchdog.abortJob(jobid)
             break
         except:
-            print "Unable to connect to server, sleeping 5 seconds..."
+            print("Unable to connect to server, sleeping 5 seconds...")
             time.sleep(5)
     return resp
 
@@ -51,7 +63,7 @@ def abortRecipeSet(server, recipesetid):
             resp = server.watchdog.abortRecipeSet(recipesetid)
             break
         except:
-            print "Unable to connect to server, sleeping 5 seconds..."
+            print("Unable to connect to server, sleeping 5 seconds...")
             time.sleep(5)
     return resp
 
@@ -61,12 +73,12 @@ def abortRecipe(server, recipeid):
             resp = server.watchdog.abortRecipe(recipeid)
             break
         except:
-            print "Unable to connect to server, sleeping 5 seconds..."
+            print("Unable to connect to server, sleeping 5 seconds...")
             time.sleep(5)
     return resp
 
 def usage():
-    print USAGE_TEXT
+    print(USAGE_TEXT)
     sys.exit(-1)
 
 def main():
@@ -107,11 +119,11 @@ def main():
             recipeid = val
 
     if not type:
-        print "You must specify a type with the -t flag"
+        print("You must specify a type with the -t flag")
         sys.exit(1)
 
     if not result_server:
-        print "you must specify a result_server with the -l flag"
+        print("you must specify a result_server with the -l flag")
         sys.exit(1)
 
     server = xmlrpclib.Server("http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % result_server)
@@ -125,10 +137,10 @@ def main():
     elif type == 'job' and jobid:
         result = abortJob(server,jobid)
     else:
-        print "Invalid type: %s or missing %sid" % (type, type)
+        print("Invalid type: %s or missing %sid" % (type, type))
         sys.exit(1)
     if result != 0:
-        print "Failed to abort!"
+        print("Failed to abort!")
         sys.exit(1)
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/bin/sh
 #
 # Copyright (c) 2006 Red Hat, Inc.
 #
@@ -18,8 +18,20 @@
 # Author: Bill Peck
 #
 
+
+# Check the correct Python executable to run this file.
+# Python3 will be preferred.
+""":"
+
+cmd=$(python-check.sh)
+
+exec -- $cmd $0 "$@";
+
+":"""
+from __future__ import print_function
+
 import sys, getopt
-import xmlrpclib
+from six.moves import xmlrpc_client as xmlrpclib
 import string
 import os
 import pprint
@@ -38,7 +50,7 @@ def report_log(recipetestid, logname, start=0):
 
 
 def usage():
-    print USAGE_TEXT
+    print(USAGE_TEXT)
     sys.exit(-1)
 
 def main():
@@ -73,20 +85,20 @@ def main():
             assert start >= 0, "start must be greater or equall zero."
 
     if not logname:
-        print "You must specify a logfile with the -l switch"
+        print("You must specify a logfile with the -l switch")
         sys.exit(1)
 
     if not result_server:
-        print "result_server not set, assuming developer mode."
-        print "Log File : %s" % logname
+        print("result_server not set, assuming developer mode.")
+        print("Log File : %s" % logname)
         sys.exit(0)
     else:
         if not recipetestid:
-           print "You must specify a recipetestid with the -T switch"
+           print("You must specify a recipetestid with the -T switch")
            sys.exit(1)
         try:
             report_log(recipetestid, logname, start=start)
-        except (IOError, OSError), e:
+        except (IOError, OSError) as e:
             sys.stderr.write('Error reading log file %s: %s\n' % (logname, e))
             sys.exit(1)
 

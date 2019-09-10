@@ -18,8 +18,8 @@ Drop-in replacement for xmlrpclib, with added support for timeouts in the
 Server class.
 """
 
-from xmlrpclib import *
-import httplib
+from six.moves.xmlrpc_client import *
+from six.moves import http_client as httplib
 import sys
 
 orig_Server = Server
@@ -36,7 +36,7 @@ class TimeoutTransport(Transport):
 
    def make_connection(self, host):
        if sys.version_info[:2] < (2, 7):
-           conn = TimeoutHTTP(host)
+           conn = TimeoutHTTPConnection(host)
            conn.set_timeout(self.timeout)
        else:
            conn = Transport.make_connection(self, host)
@@ -46,16 +46,11 @@ class TimeoutTransport(Transport):
 
 class TimeoutHTTPConnection(httplib.HTTPConnection):
 
-   def connect(self):
-       httplib.HTTPConnection.connect(self)
-       # check whether socket timeout support is available (Python >= 2.3)
-       try:
-           self.sock.settimeout(self.timeout)
-       except AttributeError:
-           pass
+    def set_timeout(self, value):
+        setattr(self, '_timeout', value)
 
-class TimeoutHTTP(httplib.HTTP):
-   _connection_class = TimeoutHTTPConnection
-
-   def set_timeout(self, timeout):
-       self._conn.timeout = timeout
+    def connect(self):
+        httplib.HTTPConnection.connect(self)
+        timeout = getattr(self, "_timeout", 0)
+        if timeout:
+            self.sock.settimeout(timeout)

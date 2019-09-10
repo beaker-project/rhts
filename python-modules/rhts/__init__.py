@@ -20,8 +20,11 @@
 #       Bill Peck <bpeck@redhat.com>
 #	Mike McLean <mikem@redhat.com> (upload helpers from koji)
 
-import sys, xmlrpclib
-from xmlrpclib import loads, Fault
+from __future__ import print_function
+
+import sys
+from six.moves import xmlrpc_client as xmlrpclib
+from six.moves.xmlrpc_client import loads, Fault
 import socket
 import time
 import os
@@ -66,11 +69,11 @@ def ensure_connection(session):
     try:
         ret = session.rhts.getAPIVersion()
     except:
-        print "Error: Unable to connect to server %s" % session.hostname
+        print("Error: Unable to connect to server %s" % session.hostname)
         sys.exit(1)
     if ret != SCHEDULER_API:
-        print "FAIL: The server is at API version %s and the client is at %s"  % (ret, SCHEDULER_API)
-	sys.exit(1)
+        print("FAIL: The server is at API version %s and the client is at %s"  % (ret, SCHEDULER_API))
+        sys.exit(1)
 
 def encode_args(*args,**opts):
     """The function encodes optional arguments as regular arguments.
@@ -90,7 +93,7 @@ def convertFault(fault):
     if code is None:
         return fault
     for v in globals().values():
-        if type(v) == type(Exception) and issubclass(v,GenericError) and \
+        if isinstance(v, Exception) and issubclass(v,GenericError) and \
                 code == getattr(v,'faultCode',None):
             ret = v(fault.faultString)
             ret.fromFault = True
@@ -117,15 +120,15 @@ def _callMethod(session, name, args, kwargs):
             if result == 0:
                 return True
             else:
-                print result
+                print(result)
                 return False
-        except Fault, fault:
+        except Fault as fault:
             raise convertFault(fault)
-        except (socket.error,socket.sslerror,xmlrpclib.ProtocolError,ssl_error), e:
+        except (socket.error,socket.sslerror,xmlrpclib.ProtocolError,ssl_error) as e:
             if debug:
-                print "Try #%d for call (%s) failed: %s" % (tries, name, e)
+                print("Try #%d for call (%s) failed: %s" % (tries, name, e))
         time.sleep(interval)
-    raise RetryError, "reached maximum number of retries, last call failed with: %s" % ''.join(traceback.format_exception_only(*sys.exc_info()[:2]))
+    raise RetryError("reached maximum number of retries, last call failed with: %s" % ''.join(traceback.format_exception_only(*sys.exc_info()[:2])))
 
 def uploadWrapper(session, localfile, recipetestid, name=None, callback=None, blocksize=262144, start=0):
     """upload a file in chunks using the uploadFile call"""
@@ -170,14 +173,14 @@ def uploadWrapper(session, localfile, recipetestid, name=None, callback=None, bl
             tries = 0
             while True:
                 if debug:
-                    print "uploadFile(%r,%r,%r,%r,%r,...)" %(recipetestid,name,sz,digest,offset)
+                    print("uploadFile(%r,%r,%r,%r,%r,...)" %(recipetestid,name,sz,digest,offset))
                 if callMethod(session, 'results.uploadFile', recipetestid, name, sz, digest, offset, data):
                     break
                 if tries <= retries:
                     tries += 1
                     continue
                 else:
-                    raise GenericError, "Error uploading file %s, offset %d" %(name, offset)
+                    raise GenericError ("Error uploading file %s, offset %d" %(name, offset))
             if size == 0:
                 break
             ofs += size
@@ -189,9 +192,9 @@ def uploadWrapper(session, localfile, recipetestid, name=None, callback=None, bl
             if t2 <= 0:
                 t2 = 1
             if debug:
-                print "Uploaded %d bytes in %f seconds (%f kbytes/sec)" % (size,t1,size/t1/1024)
+                print("Uploaded %d bytes in %f seconds (%f kbytes/sec)" % (size,t1,size//t1//1024))
             if debug:
-                print "Total: %d bytes in %f seconds (%f kbytes/sec)" % (ofs,t2,ofs/t2/1024)
+                print("Total: %d bytes in %f seconds (%f kbytes/sec)" % (ofs,t2,ofs//t2//1024))
             if callback:
                 callback(ofs, totalsize, size, t1, t2)
         fo.close()

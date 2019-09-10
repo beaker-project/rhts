@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/bin/sh
 #
 # Copyright (c) 2006 Red Hat, Inc.
 #
@@ -18,6 +18,19 @@
 # Author: Bill Peck
 #
 
+
+# Check the correct Python executable to run this file.
+# Python3 will be preferred.
+""":"
+
+cmd=$(python-check.sh)
+
+exec -- $cmd $0 "$@";
+
+":"""
+from __future__ import print_function
+
+from six.moves import input
 import sys, getopt
 
 # xmlrpclib doesn't support timeouts
@@ -53,10 +66,10 @@ def sync_block(states,machines,any_machine,timeout):
     result_server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % result_server
 
     if not result_server:
-       raise Exception, "You must specify the result server with the -R switch"
+       raise Exception("You must specify the result server with the -R switch")
 
     if not recipesetid:
-       raise Exception, "You must specify the recipesetid with the -r switch"
+       raise Exception("You must specify the recipesetid with the -r switch")
 
     client = xmlrpclib.Server(result_server)
     curr_states = []
@@ -67,7 +80,7 @@ def sync_block(states,machines,any_machine,timeout):
                     curr_states.extend(client.sync.block(recipesetid,-1,result_server,states,[machine]))
                 except socket.timeout:
                     info('rhts-recipe-sync-block Timeout!')
-                except Exception, e:
+                except Exception as e:
                     info('rhts-recipe-sync-block: %s' % e)
                 if curr_states:
                     break
@@ -76,7 +89,7 @@ def sync_block(states,machines,any_machine,timeout):
                 curr_states = client.sync.block(recipesetid,-1,result_server,states,machines)
             except socket.timeout:
                 info('rhts-recipe-sync-block Timeout!')
-            except Exception, e:
+            except Exception as e:
                 info('rhts-recipe-sync-block: %s' % e)
         if curr_states:
             break
@@ -85,7 +98,7 @@ def sync_block(states,machines,any_machine,timeout):
             return 1
         time.sleep(5)
 
-    print string.join(curr_states,":")
+    print(string.join(curr_states,":"))
     return 0
 
 
@@ -123,17 +136,17 @@ def main():
 
     machines = args[0:]
     if not machines:
-        print "no machines specified. exiting"
+        print("no machines specified. exiting")
         return -1
 
     if not states:
-       raise Exception, "You must specify a state with the -s switch"
+       raise Exception("You must specify a state with the -s switch")
 
     if not result_server:
         sys.stderr.write("result_server not set, assuming developer mode.\n")
         sys.stderr.write("Enter STATE:STATE:etc. when the following machines\n %s\nare in one of these states: %s" % (machines,states))
-        resp = raw_input()
-	print resp
+        resp = input()
+        print(resp)
     else:
         return sync_block(states,machines,any_machine,timeout)
 

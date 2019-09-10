@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/bin/sh
 #
 # Copyright (c) 2012 Red Hat, Inc.
 #
@@ -15,9 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see http://www.gnu.org/licenses/.
 
+
+# Check the correct Python executable to run this file.
+# Python3 will be preferred.
+""":"
+
+cmd=$(python-check.sh)
+
+exec -- $cmd $0 "$@";
+
+":"""
+from __future__ import print_function
+
 import sys
 import os
 import rhts.timeout_xmlrpclib
 
 server = rhts.timeout_xmlrpclib.Server('http://%s:8000/RPC2' % os.environ['LAB_CONTROLLER'])
-print server.power(sys.argv[1], sys.argv[2])
+print(server.power(sys.argv[1], sys.argv[2]))

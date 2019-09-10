@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/bin/sh
 #
 # Copyright (c) 2010-2012 Red Hat, Inc.
 #
@@ -15,9 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see http://www.gnu.org/licenses/.
 
+
+# Check the correct Python executable to run this file.
+# Python3 will be preferred.
+""":"
+
+cmd=$(python-check.sh)
+
+exec -- $cmd $0 "$@";
+
+":"""
+
+
 """
 Tool to generate a specfile, based on a list of testinfo.desc filenames
 """
+from __future__ import print_function
 import sys
 import re
 import os
@@ -42,112 +55,112 @@ def generate_specfile(testinfos, name, version, release, strictRequires, strictA
         testinfo = testinfos[0]
 
     if len(testinfos)>1:
-        print "Summary:        Collection of automated tests"
+        print("Summary:        Collection of automated tests")
     else:
-        print 'Summary:        RHTS test "%s"'%testinfo.test_name
+        print('Summary:        RHTS test "%s"'%testinfo.test_name)
         
-    print "Name:           %s"%name
-    print "Version:        %s"%version
-    print "Release:        %s"%release
-    print "Group:          System Environment/Base"
-    print "URL:            %s" % url
+    print("Name:           %s"%name)
+    print("Version:        %s"%version)
+    print("Release:        %s"%release)
+    print("Group:          System Environment/Base")
+    print("URL:            %s" % url)
     if len(testinfos)>1:
-        print "License:        various"
+        print("License:        various")
     else:
-        print "License:        %s"%testinfo.license
+        print("License:        %s"%testinfo.license)
         
-    print "Buildroot:      %{_tmppath}/%{name}-%{version}-root"
+    print("Buildroot:      %{_tmppath}/%{name}-%{version}-root")
     if not strictABI:
-        print "BuildArch: noarch"
-    print
-    print "# Tests need the testing env package to be runnable:"
-    print "Requires: rhts-test-env"
-    print
+        print("BuildArch: noarch")
+    print("")
+    print("# Tests need the testing env package to be runnable:")
+    print("Requires: rhts-test-env")
+    print("")
     extra_provides = provides
     for test in testinfos:
-        print "# Provides/Requires for test '%s'"%test.test_name
-        print "Provides: test(%s) = %s-%s" % (test.test_name, version, release)
+        print("# Provides/Requires for test '%s'"%test.test_name)
+        print("Provides: test(%s) = %s-%s" % (test.test_name, version, release))
         for provides in test.provides + extra_provides:
             # RPM Dependency tokens must begin with alpha-numeric, '_' or '/':
             if re.match('^[A-Za-z0-9_/].*$', provides):
-                print "Provides: %s = %s-%s" % (provides, version, release)
+                print("Provides: %s = %s-%s" % (provides, version, release))
             else:
-                print "# testinfo requirement not usable in specfile: Provides: %s" % provides
+                print("# testinfo requirement not usable in specfile: Provides: %s" % provides)
         for requires in test.rhtsrequires:
             # RPM Dependency tokens must begin with alpha-numeric, '_' or '/':
             if re.match('^[A-Za-z0-9_/].*$', requires):
-                print "Requires: %s"%requires
+                print("Requires: %s"%requires)
             else:
-                print "# testinfo requirement not usable in specfile: Requires: %s"%requires
+                print("# testinfo requirement not usable in specfile: Requires: %s"%requires)
         for requires in test.requires:
             # RPM Dependency tokens must begin with alpha-numeric, '_' or '/':
             if strictRequires:
                 if re.match('^[A-Za-z0-9_/].*$', requires):
-                    print "Requires: %s"%requires
+                    print("Requires: %s"%requires)
                 else:
-                    print "# testinfo requirement not usable in specfile: Requires: %s"%requires
+                    print("# testinfo requirement not usable in specfile: Requires: %s"%requires)
             else:
-                print "# requirement generation disabled; not adding Requires: %s"%requires
+                print("# requirement generation disabled; not adding Requires: %s"%requires)
         for runfor in test.runfor:
-            print "Provides: test-of(%s)-%s = %s-%s" % (runfor, test.test_name, version, release)
-            print "# from RunFor: %s"%runfor
+            print("Provides: test-of(%s)-%s = %s-%s" % (runfor, test.test_name, version, release))
+            print("# from RunFor: %s"%runfor)
             # so that you can "yum install test-of(somepackage)\*" and it will pull
             # in all tests
-        print
+        print("")
     if not strictABI:
-        print "AutoReqProv: no:"
-    print
-    print "Source0:	%s"%get_tarball_name(name, version, release)
-    print
-    print "%define _source_filedigest_algorithm 0"
-    print "%define _binary_filedigest_algorithm 0"
-    print "%define _source_payload       w9.gzdio"
-    print "%define _binary_payload       w9.gzdio"
-    print "%define __debug_install_post %{nil}  "
-    print "%define __spec_install_post %{__debug_install_post}  /usr/lib/rpm/brp-compress || :"
-    print
-    print "%description"
+        print("AutoReqProv: no:")
+    print("")
+    print("Source0:	%s"%get_tarball_name(name, version, release))
+    print("")
+    print("%define _source_filedigest_algorithm 0")
+    print("%define _binary_filedigest_algorithm 0")
+    print("%define _source_payload       w9.gzdio")
+    print("%define _binary_payload       w9.gzdio")
+    print("%define __debug_install_post %{nil}  ")
+    print("%define __spec_install_post %{__debug_install_post}  /usr/lib/rpm/brp-compress || :")
+    print("")
+    print("%description")
     if len(testinfos)>1:
-        print "This package contains automated tests"
+        print("This package contains automated tests")
     else:
-        print testinfo.test_description
-    print
-    print "%prep"
-    print
-    print "%setup -q -c "
-    print
-    print "%build"
-    print '[ "$RPM_BUILD_ROOT" != "/" ] && [ -d $RPM_BUILD_ROOT ] && rm -rf $RPM_BUILD_ROOT;'
-    print "mkdir -p %{buildroot}/mnt/tests"
+        print(testinfo.test_description)
+    print("")
+    print("%prep")
+    print("")
+    print("%setup -q -c ")
+    print("")
+    print("%build")
+    print('[ "$RPM_BUILD_ROOT" != "/" ] && [ -d $RPM_BUILD_ROOT ] && rm -rf $RPM_BUILD_ROOT;')
+    print("mkdir -p %{buildroot}/mnt/tests")
     if strictABI:
-        print "make DEST=$RPM_BUILD_ROOT build"
-    print 
-    print 
-    print "%install"
-    print "mkdir -p %{buildroot}/mnt/tests"
-    print 
-    print "make DEST=$RPM_BUILD_ROOT install"
+        print("make DEST=$RPM_BUILD_ROOT build")
+    print("")
+    print("")
+    print("%install")
+    print("mkdir -p %{buildroot}/mnt/tests")
+    print("")
+    print("make DEST=$RPM_BUILD_ROOT install")
     if strictABI:
-        print "make DEST=$RPM_BUILD_ROOT install-built-files"
-    print 
-    print "chmod -R a-s  %{buildroot}"
-    print 
-    print "%clean"
-    print '[ "$RPM_BUILD_ROOT" != "/" ] && [ -d $RPM_BUILD_ROOT ] && rm -rf $RPM_BUILD_ROOT;'
-    print 
-    print 
-    print "%files"
-    print "%defattr(-,root,root,0755)"
-    print "/mnt/tests"
-    print 
-    print "%changelog"
+        print("make DEST=$RPM_BUILD_ROOT install-built-files")
+    print("")
+    print("chmod -R a-s  %{buildroot}")
+    print("")
+    print("%clean")
+    print('[ "$RPM_BUILD_ROOT" != "/" ] && [ -d $RPM_BUILD_ROOT ] && rm -rf $RPM_BUILD_ROOT;')
+    print("")
+    print("")
+    print("%files")
+    print("%defattr(-,root,root,0755)")
+    print("/mnt/tests")
+    print("")
+    print("%changelog")
     if len(testinfos)>1:
         author = testinfos[0].owner # arbitrarily pick owner of first test
     else:
         author = testinfo.owner
-    print "* Fri May 26 2006	%s - %s-%s"%(author, version, release)
-    print "- Autogenerated specfile"
-    print 
+    print("* Fri May 26 2006	%s - %s-%s"%(author, version, release))
+    print("- Autogenerated specfile")
+    print("")
 
 def test():
     ti = rhts.testinfo.parse_string("""\
@@ -206,7 +219,7 @@ if __name__=='__main__':
         testinfoFiles.append(parse_file(filename))
     #print testinfoFiles
     if len(testinfoFiles)==0:
-        print "No testinfo.desc filenames on stdin"
+        print("No testinfo.desc filenames on stdin")
         sys.exit (1)
     generate_specfile(testinfoFiles, name, version, release,
         strictRequires=options.strictRequires, strictABI=options.strictABI,

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/bin/sh
 #
 # Copyright (c) 2006 Red Hat, Inc.
 #
@@ -16,6 +16,18 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 # Author: Bill Peck
+
+
+# Check the correct Python executable to run this file.
+# Python3 will be preferred.
+""":"
+
+cmd=$(python-check.sh)
+
+exec -- $cmd $0 "$@";
+
+":"""
+from __future__ import print_function
 
 import sys, getopt
 # xmlrpclib doesn't support timeouts
@@ -40,15 +52,15 @@ def sync_set(state):
     result_server = "http://%s/cgi-bin/rhts/scheduler_xmlrpc.cgi" % result_server
 
     if not result_server:
-       print "You must specify the result server with the -R switch"
+       print("You must specify the result server with the -R switch")
        sys.exit(1)
 
     if not hostname:
-       print "You must specify the hostname with the -m switch"
+       print("You must specify the hostname with the -m switch")
        sys.exit(1)
 
     if not recipesetid:
-       print "You must specify the recipesetid with the -r switch"
+       print("You must specify the recipesetid with the -r switch")
        sys.exit(1)
 
     client = xmlrpclib.Server(result_server)
@@ -60,20 +72,20 @@ def sync_set(state):
                 # We successfully set our state.  Exit.
                 break
         except:
-            print "Unable to connect to server, sleeping 5 seconds..."
+            print("Unable to connect to server, sleeping 5 seconds...")
             time.sleep(5)
 
     if(resp != 0) :
-        raise NameError, "ERROR: setting state...."
+        raise NameError("ERROR: setting state....")
 
 def usage():
-    print USAGE_TEXT
+    print(USAGE_TEXT)
     sys.exit(-1)
 
 def main():
     global result_server, hostname, recipesetid
 
-    if ('RESULT_SERVER' in os.environ.keys()):
+    if ('RESULT_SERVER' os.environ.keys()):
         result_server = os.environ['RESULT_SERVER']
     if ('RECIPESETID' in os.environ.keys()):
         recipesetid = os.environ['RECIPESETID']
@@ -97,12 +109,12 @@ def main():
             recipesetid = val
 
     if not state:
-        print "You must specify a state with the -s switch"
+        print("You must specify a state with the -s switch")
         sys.exit(1)
 
     if not result_server:
-        print "result_server not set, assuming developer mode."
-        print "Setting %s to state %s" % (hostname,state)
+        print("result_server not set, assuming developer mode.")
+        print("Setting %s to state %s" % (hostname,state))
         sys.exit(0)
     else:
         sync_set(state)

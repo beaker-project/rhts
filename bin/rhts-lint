@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/bin/sh
 #
 # Copyright (c) 2006 Red Hat, Inc.
 #
@@ -17,12 +17,23 @@
 #
 # Author: David Malcolm
 
+
+# Check the correct Python executable to run this file.
+# Python3 will be preferred.
+""":"
+
+cmd=$(python-check.sh)
+
+exec -- $cmd $0 "$@";
+
+":"""
+
 import sys
 import fileinput
 import unittest
 import rhts.testinfo
 
-class __DeferredFileInputFilenameString:
+class __DeferredFileInputFilenameString(object):
     """
     The PrintingParser classes want to have a filename so they can give
     useful error messages.

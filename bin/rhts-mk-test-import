@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/bin/sh
 #
 # Copyright (c) 2006 Red Hat, Inc.
 #
@@ -18,8 +18,22 @@
 # Author: Greg Nichols
 # Updated by: Bill Peck <bpeck@redhat.com>
 
+
+# Check the correct Python executable to run this file.
+# Python3 will be preferred.
+""":"
+
+cmd=$(python-check.sh)
+
+exec -- $cmd $0 "$@";
+
+":"""
+from __future__ import print_function
+
 # Use a hardcoded path for RHTS python modules for now:
-import sys, xmlrpclib, os
+import sys
+import os
+from six.moves import xmlrpc_client as xmlrpclib
 import rhts
 from rhts.rhts_workflow import Scheduler
 
@@ -28,7 +42,7 @@ Usage:
     rhts-mk-test-import <scheduler> <rpmname> <version>
 """
 def usage():
-    print USAGE_TEXT
+    print(USAGE_TEXT)
     sys.exit(-1)
 
 def read_rpm(filename):
@@ -39,7 +53,7 @@ def read_rpm(filename):
 
 args = sys.argv[1:]
 if len(args) != 3:
-  print "ERROR: %s args provided" % (len(args))
+  print("ERROR: %s args provided" % (len(args)))
   usage()
 
 testrpmname = sys.argv[2]
@@ -55,7 +69,7 @@ data = read_rpm(testrpmname)
 binarydata = xmlrpclib.Binary(data)
 basetestrpmname = os.path.basename(testrpmname)
 (ret, msg) = sched.test.import_testrpm(basetestrpmname,binarydata,testversion)
-print msg
+print(msg)
 if ret:
     sys.exit(0)
 else:

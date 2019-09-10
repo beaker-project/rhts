@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/bin/sh
 #
 # Copyright (c) 2010 Red Hat, Inc.
 #
@@ -16,19 +16,34 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 
 
-import sys, xmlrpclib, syslog, os, time
+# Check the correct Python executable to run this file.
+# Python3 will be preferred.
+""":"
+
+cmd=$(python-check.sh)
+
+exec -- $cmd $0 "$@";
+
+":"""
+from __future__ import print_function
+
+import sys
+from six.moves import xmlrpc_client as xmlrpclib
+import syslog
+import os
+import time
 
 USAGE_TEXT = """
 Usage:
     rhts-test-checkin <lab_server> <hostname> <jobid> <test> <killtime> <testid>
 """
 def usage():
-    print USAGE_TEXT
+    print(USAGE_TEXT)
     sys.exit(-1)
 
 args = sys.argv[1:]
 if len(args) != 6:
-  print "ERROR: %s args provided" % (len(args))
+  print("ERROR: %s args provided" % (len(args)))
   usage()
 
 timetext = time.strftime('%m/%d/%y %H:%M:%S ', time.localtime(time.time()))
@@ -47,7 +62,7 @@ while True:
         resp = client.watchdog.testCheckin(hostname, jobid, test, killtime, testid)
         break
     except:
-        print "Unable to connect to server, sleeping 5 seconds..."
+        print("Unable to connect to server, sleeping 5 seconds...")
         time.sleep(5)
 
 # syslog the message
