@@ -85,7 +85,7 @@ def usage():
 def main():
     global result_server, hostname, recipesetid
 
-    if ('RESULT_SERVER' os.environ.keys()):
+    if ('RESULT_SERVER' in os.environ.keys()):
         result_server = os.environ['RESULT_SERVER']
     if ('RECIPESETID' in os.environ.keys()):
         recipesetid = os.environ['RECIPESETID']

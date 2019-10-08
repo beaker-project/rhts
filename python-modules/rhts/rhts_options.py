@@ -32,7 +32,7 @@ from optparse import OptionParser
 
 
 class RHTSOptions(OptionParser):
-    VALIDWORKFLOWS = [ 'beehive_package', 'compare_workflow',
+    VALIDWORKFLOWS = ['beehive_package', 'compare_workflow',
 'kernel_workflow', 'milestone_matrix', 'release_package', 'rsync',
 'tier1_workflow', 'xen_workflow', 'bringup', 'libworkflow',
 'multi-stable-workflow', 'reserve_workflow', 'single_package', 
@@ -52,13 +52,14 @@ class. Its sole use is for possible different values to add_option method based
 on different workflows"""
         if 'workflow' in kwds:
             if kwds['workflow'] not in self.VALIDWORKFLOWS:
-                print("Sorry %s is not a known workflow. Valid ones are : %s \n If you need to, please add it on %s file." 
-                % (kwds['workflow'], self.VALIDWORKFLOWS, __file__ ))
+                print("Sorry %s is not a known workflow. Valid ones are : \
+                         %s \n If you need to, please add it on %s file."
+                         % (kwds['workflow'], self.VALIDWORKFLOWS, __file__))
                 sys.exit(10)
             self.WORKFLOW = kwds['workflow']
             del kwds['workflow']
         OptionParser.__init__(self, **kwds)
-        #print "file is  :%s " % args[0]
+        # print "file is  :%s " % args[0]
         self.loadAllArgs()
 
     def loadAllArgs(self):
@@ -71,8 +72,7 @@ for consistency reasons, every option that has a short option must have a long
 option too. If the option has a short option, short option must be the first
 argument, otherwise the long argument must be the first argument"""
 
-        self.add_option("-A", "--add-repo", dest="addrepo", metavar="ADDREPO", 
-            action="append",
+        self.add_option("-A", "--add-repo", dest="addrepo", metavar="ADDREPO", action="append",
             help="Location to add repo... i.e. http://hostname/dir;ftp://hostname/dir;file:///full/path/to/dir")
         self.add_option("-a", "--arch", dest="arch", metavar=" ARCH", action="append",
             help="Install this arch on system")
@@ -82,7 +82,7 @@ argument, otherwise the long argument must be the first argument"""
             help="set container type to either loopback, partition or lvm")
         self.add_option("-d", "--distro", dest="distro", metavar="DISTRO",
             help="use distribution tree DISTRO")
-        self.add_option("-D", "--gdistro", dest="gdistro", metavar="GUESTDISTRO", 
+        self.add_option("-D", "--gdistro", dest="gdistro", metavar="GUESTDISTRO",
             help="guest's distro. default assumes same as host distro.")
         self.add_option("-e", "--test-repo", dest="test_repo", metavar="REPO",
             help="Include tests from specific repository")

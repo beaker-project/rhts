@@ -24,25 +24,25 @@ import sys
 
 orig_Server = Server
 def Server(url, *args, **kwargs):
-   t = TimeoutTransport()
-   t.timeout = kwargs.get('timeout', 20)
-   if 'timeout' in kwargs:
-       del kwargs['timeout']
-   kwargs['transport'] = t
-   server = orig_Server(url, *args, **kwargs)
-   return server
+    t = TimeoutTransport()
+    t.timeout = kwargs.get('timeout', 20)
+    if 'timeout' in kwargs:
+        del kwargs['timeout']
+    kwargs['transport'] = t
+    server = orig_Server(url, *args, **kwargs)
+    return server
 
 class TimeoutTransport(Transport):
 
-   def make_connection(self, host):
-       if sys.version_info[:2] < (2, 7):
-           conn = TimeoutHTTPConnection(host)
-           conn.set_timeout(self.timeout)
-       else:
-           conn = Transport.make_connection(self, host)
-           if self.timeout:
-               conn.timeout = self.timeout
-       return conn
+    def make_connection(self, host):
+        if sys.version_info[:2] < (2, 7):
+            conn = TimeoutHTTPConnection(host)
+            conn.set_timeout(self.timeout)
+        else:
+            conn = Transport.make_connection(self, host)
+            if self.timeout:
+                conn.timeout = self.timeout
+        return conn
 
 class TimeoutHTTPConnection(httplib.HTTPConnection):
 
