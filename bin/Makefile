@@ -1,7 +1,7 @@
 # "Public" scripts, installed to /usr/bin:
 PUBLIC_SHELL_SCRIPTS := rhts-run-package rhts-backup rhts-restore \
          rhts-environment.sh rhts-reboot rhts-report-result rhts-run-simple-test \
-         rhts-system-info rhts-test-runner.sh rhts-extend python-check.sh
+         rhts-system-info rhts-test-runner.sh rhts-extend
 PUBLIC_PYTHON_SCRIPTS := rhts-lint rhts-abort rhts-db-submit-result \
          rhts-recipe-sync-block rhts-recipe-sync-set rhts-sync-block rhts-sync-set \
          rhts-submit-log rhts-test-checkin rhts-test-update rhts-power
@@ -12,7 +12,7 @@ PRIVATE_SHELL_SCRIPTS :=  rhts-mk-build-package \
          rhts-mk-get-current-tag rhts-mk-get-next-tag \
          rhts-mk-get-test-package-name rhts-mk-get-version-info \
          rhts-mk-tag-release rhts-mk-snake-template rhts-mk-diff-since-last-tag \
-         rhts-mk-get-test-package-url
+         rhts-mk-get-test-package-url python-check.sh
 PRIVATE_PYTHON_SCRIPTS := rhts-mk-test-import rhts-mk-generate-specfile
 
 PUBLIC_FILES := $(PUBLIC_SHELL_SCRIPTS) $(PUBLIC_PYTHON_SCRIPTS)

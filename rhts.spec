@@ -2,6 +2,12 @@
 %{!?python2_sitelib: %global python2_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 %{!?pyver: %global pyver %(%{__python} -c "import sys ; print(sys.version[:3])")}
 
+%if 0%{?fedora} >= 30 || 0%{?rhel} >= 8
+%bcond_without python3
+%else
+%bcond_with python3
+%endif
+
 Name: rhts
 Summary: Automated software testing
 Version: 4.75
@@ -11,14 +17,19 @@ License: GPLv2+
 Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildArch: noarch
+%if %{with python3}
+BuildRequires: python3-devel
+BuildRequires: python3-pyOpenSSL
+%else
 BuildRequires: python-devel
+%endif
 %if 0%{?rhel}%{?fedora} > 4
 BuildRequires: selinux-policy-devel
 %endif
 
 %description
 This package is intended for people creating and maintaining tests, and
-contains (or requires) the runtime components of the test system for 
+contains (or requires) the runtime components of the test system for
 installation on a workstation, along with development tools.
 
 %package devel
@@ -37,7 +48,7 @@ Requires: rpm-build
 Conflicts: beaker-client < 0.9.4
 
 %description devel
-This package contains components of the test system used when running 
+This package contains components of the test system used when running
 tests, either on a developer's workstation, or within a lab.
 
 %package test-env
@@ -58,7 +69,7 @@ Requires(post): policycoreutils
 %endif
 
 %description test-env
-This package contains components of the test system used when running 
+This package contains components of the test system used when running
 tests, either on a developer's workstation, or within a lab.
 
 %package python
@@ -67,7 +78,7 @@ Group:          Development/Libraries
 Conflicts:      rhts-test-env < 4.44
 
 %description python
-This package provides the rhts Python module, for use by rhts scripts and 
+This package provides the rhts Python module, for use by rhts scripts and
 related programs.
 
 %prep
@@ -77,25 +88,33 @@ related programs.
 %build
 [ "$RPM_BUILD_ROOT" != "/" ] && [ -d $RPM_BUILD_ROOT ] && rm -rf $RPM_BUILD_ROOT;
 pushd python-modules
+%if %{with python3}
+%py3_build
+%else
 CFLAGS="$RPM_OPT_FLAGS" %{__python2} setup.py build
+%endif
 popd
 
 %install
 DESTDIR=$RPM_BUILD_ROOT make install
-pushd python-modules 
+pushd python-modules
+%if %{with python3}
+%py3_install
+%else
 %{__python2} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
+%endif
 popd
 
 %if 0%{?rhel}%{?fedora} > 4
-# Build RHTS Selinux Testing Policy 
+# Build RHTS Selinux Testing Policy
 pushd selinux
 # If dist specific selinux module is present use that.
 # Why:
 #  newer releases may introduce new selinux macros which are not present in
 #  older releases.  This means that a module built under the newer release
-#  will no longer load on an older release.  
+#  will no longer load on an older release.
 # How:
-#  Simply issue the else statement on the older release and commit the 
+#  Simply issue the else statement on the older release and commit the
 #  policy to git with the appropriate dist tag.
 if [ -e "rhts%{?dist}.pp" ]; then
     install -p -m 644 -D rhts%{?dist}.pp $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}/rhts.pp
@@ -190,12 +209,17 @@ fi
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-tag-release
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-test-import
 %attr(0755, root, root)%{_libexecdir}/rhts/rhts-mk-diff-since-last-tag
+%attr(0755, root, root)%{_libexecdir}/rhts/python-check.sh
 %doc doc/Makefile.template
 %doc doc/runtest.sh.template
 
 %files python
 %defattr(-,root,root)
+%if %{with python3}
+%{python3_sitelib}/%{name}*
+%else
 %{python2_sitelib}/%{name}*
+%endif
 
 %changelog
 * Fri Jul 26 2019 Martin Styk <mastyk@redhat.com> 4.75-1
