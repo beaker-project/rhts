@@ -25,12 +25,12 @@ cmd=$(python-check.sh)
 exec -- $cmd $0 "$@";
 
 ":"""
-
+from __future__ import print_function
 
 """
 Tool to generate a specfile, based on a list of testinfo.desc filenames
 """
-from __future__ import print_function
+
 import sys
 import re
 import os
