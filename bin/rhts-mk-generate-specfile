@@ -42,7 +42,7 @@ import rhts.testinfo
 # when we write unicode to stdout. But this script is specifically designed for
 # piping stdout to a file to produce the .spec, which is always UTF-8 encoded.
 # So let's just hack it:
-sys.stdout = codecs.getwriter('utf8')(sys.stdout)
+# sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
 def get_tarball_name(name, version, release):
     return "%s-%s-%s.tar.gz"%(name, version, release)
@@ -186,7 +186,7 @@ def test():
 
 def parse_file(filename):
     p = rhts.testinfo.StderrParser(filename)
-    p.parse(codecs.open(filename, 'r', 'utf8').readlines())
+    p.parse(codecs.open(filename, 'rb', 'utf8').readlines())
     if p.numErrors>0:
         sys.exit(1)
     return p.info

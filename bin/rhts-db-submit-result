@@ -216,7 +216,7 @@ def read_file(filename):
     if filename == "-":
         data = sys.stdin.read() 
     else :
-        FH = open(filename, "r")
+        FH = open(filename, "rb")
         data = FH.read()
         FH.close()
     return data
@@ -486,7 +486,7 @@ def avc_check(error_file, dmesg_file):
 
     #Write to log_file (and record timestamp)
     print("Writing to %s\n:" % (log_file))
-    LF = open(log_file, 'w')
+    LF = open(log_file, 'wb')
     LF.write(context.get_message())
     LF.close( )
 
@@ -545,7 +545,7 @@ def check_for_errors(dmesg_data, failure_strings=None, false_strings=None):
         errors = '\n'.join(errors)
 
         #Write to dmesg_log_file
-        LF = open(dmesg_log_file, 'w')
+        LF = open(dmesg_log_file, 'wb')
         LF.write(errors)
         LF.close( )
         if debug:
@@ -672,7 +672,7 @@ def main():
             if logfile == "-":
                 logfile = mktemp_file()
                 log = sys.stdin.read() 
-                LF = open(logfile, 'w')
+                LF = open(logfile, 'wb')
                 LF.write(log)
                 LF.close( )
             else:

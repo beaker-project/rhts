@@ -46,7 +46,7 @@ def usage():
     sys.exit(-1)
 
 def read_rpm(filename):
-    FH = open(filename, "r")
+    FH = open(filename, "rb")
     data = FH.read()
     FH.close()
     return data
