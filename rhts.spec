@@ -10,7 +10,7 @@
 
 Name: rhts
 Summary: Automated software testing
-Version: 4.75
+Version: 5.0
 Release: 1%{?dist}
 Group: Development/Libraries
 License: GPLv2+
@@ -222,6 +222,30 @@ fi
 %endif
 
 %changelog
+* Thu Oct 10 2019 Martin Styk <mastyk@redhat.com> 5.0-1
+- Make sure file operations have binary mode (rebarbos@redhat.com)
+- Move future import to start of file (rebarbos@redhat.com)
+- Update spec file for python 3 builds (mastyk@redhat.com)
+- Fix linter issues and small mistakes (rebarbos@redhat.com)
+- Adapt RHTS to work with Python 3 (rebarbos@redhat.com)
+:x
+- Add new GitHub Action for RPM build (mastyk@redhat.com)
+- Add step to satisfy dependencies during testing (mastyk@redhat.com)
+- Create requirements.txt (mastyk@redhat.com)
+- Add GitHub Actions into RHTS repo (mastyk@redhat.com)
+- Add LICENSE (mastyk@redhat.com)
+- Update .stickler.yml (mastyk@redhat.com)
+- Adding .stickler.yml (support@stickler-ci.com)
+- Update tito configs with actual releases (mastyk@redhat.com)
+- Create .gitignore in rhts (mastyk@redhat.com)
+- Revert "Automatic commit of package [rhts] release [4.76-1]."
+  (mastyk@redhat.com)
+- Revert "Automatic commit of package [rhts] release [4.77-1]."
+  (mastyk@redhat.com)
+- Update tito.props (mastyk@redhat.com)
+- Automatic commit of package [rhts] release [4.77-1]. (mastyk@redhat.com)
+- Automatic commit of package [rhts] release [4.76-1]. (mastyk@redhat.com)
+
 * Fri Jul 26 2019 Martin Styk <mastyk@redhat.com> 4.75-1
 - rhts-mk-build-package allows using binary data in rpm creation
   (mastyk@redhat.com)
