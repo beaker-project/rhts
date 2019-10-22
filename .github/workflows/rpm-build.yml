@@ -32,4 +32,12 @@ jobs:
       - name: Build RPM w/ tito
         run: |
           tito build --test --rpm
-
+      - name: Show content of /tmp dir
+        run: |
+          ls -la /tmp
+          ls -la /tmp/tito/
+      - name: Archive RPM build
+        uses: actions/upload-artifact@v1
+        with:
+          name: rpm-dist
+          path: /tmp/tito/
