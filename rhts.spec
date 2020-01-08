@@ -1,6 +1,5 @@
 %{!?__python2: %global __python2 /usr/bin/python2}
 %{!?python2_sitelib: %global python2_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%{!?pyver: %global pyver %(%{__python} -c "import sys ; print(sys.version[:3])")}
 
 %if 0%{?fedora} >= 30 || 0%{?rhel} >= 8
 %bcond_without python3
