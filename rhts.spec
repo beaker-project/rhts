@@ -10,7 +10,7 @@
 Name: rhts
 Summary: Automated software testing
 Version: 5.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/Libraries
 License: GPLv2+
 Source0: http://fedorahosted.org/releases/r/h/%{name}-%{version}.tar.gz
@@ -221,6 +221,9 @@ fi
 %endif
 
 %changelog
+* Wed Jan 08 2020 Martin Styk <mastyk@redhat.com> 5.0-2
+- spec: remove pyver macro (mastyk@redhat.com)
+
 * Thu Oct 10 2019 Martin Styk <mastyk@redhat.com> 5.0-1
 - Make sure file operations have binary mode (rebarbos@redhat.com)
 - Move future import to start of file (rebarbos@redhat.com)
