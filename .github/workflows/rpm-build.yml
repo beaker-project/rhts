@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        fedora-version: [29, 30, 31, rawhide]
+        fedora-version: [30, 31, 32, rawhide]
     container:
       image: fedora:${{ matrix.fedora-version }}
     steps:
