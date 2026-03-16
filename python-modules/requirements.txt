@@ -1,2 +1,2 @@
 six==1.12.0
-pyOpenSSL==19.0.0
+pyOpenSSL==26.0.0
